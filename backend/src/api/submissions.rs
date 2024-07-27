@@ -1,4 +1,8 @@
-use std::{path::PathBuf, str::FromStr};
+use std::{
+    path::PathBuf,
+    process::{Child, Command, Stdio},
+    str::FromStr,
+};
 
 use rocket::{
     post,
@@ -29,13 +33,30 @@ impl FromStr for Language {
 
 #[derive(Debug)]
 pub struct Submission {
+    name: String,
     lang: Language,
     code: PathBuf,
 }
 
 impl Submission {
-    fn start(&self) {
-        todo!()
+    pub async fn start(&self) -> Result<Child, Error> {
+        match self.lang {
+            Language::Python => Command::new("docker")
+                .args([
+                    "run",
+                    "-v",
+                    format!("{}:/script.py", self.code.to_string_lossy()).as_str(),
+                    "-i",
+                    "python:3-bullseye",
+                    "python",
+                    "/script.py"
+                ])
+                .stdin(Stdio::piped())
+                .stdout(Stdio::piped())
+                .spawn()
+                .map_err(Error::from),
+            _ => todo!(),
+        }
     }
 }
 
@@ -57,11 +78,14 @@ pub async fn post_submission(
         .await
         .inspect_err(|e| println!("{e:#?}"))?;
 
-    state
-        .lock()
-        .unwrap()
-        .submissions
-        .insert(email, Submission { lang, code: path });
+    state.lock().await.submissions.insert(
+        email.clone(),
+        Submission {
+            name: email,
+            lang,
+            code: path,
+        },
+    );
 
     Ok(())
 }
