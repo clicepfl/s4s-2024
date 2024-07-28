@@ -1,6 +1,6 @@
 use play::Game;
-use rocket::{response::Responder, routes, tokio::sync::Mutex, Route};
-use std::collections::HashMap;
+use rocket::{response::Responder, routes, Route};
+use std::{collections::HashMap, sync::Mutex};
 use submissions::Submission;
 use uuid::Uuid;
 

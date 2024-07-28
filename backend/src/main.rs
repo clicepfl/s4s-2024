@@ -1,5 +1,7 @@
+use std::sync::Mutex;
+
 use api::State;
-use rocket::{launch, tokio::sync::Mutex};
+use rocket::launch;
 
 pub mod api;
 pub mod game;

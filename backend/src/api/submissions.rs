@@ -39,7 +39,7 @@ pub struct Submission {
 }
 
 impl Submission {
-    pub async fn start(&self) -> Result<Child, Error> {
+    pub fn start(&self) -> Result<Child, Error> {
         match self.lang {
             Language::Python => Command::new("docker")
                 .args([
@@ -49,7 +49,7 @@ impl Submission {
                     "-i",
                     "python:3-bullseye",
                     "python",
-                    "/script.py"
+                    "/script.py",
                 ])
                 .stdin(Stdio::piped())
                 .stdout(Stdio::piped())
@@ -78,7 +78,7 @@ pub async fn post_submission(
         .await
         .inspect_err(|e| println!("{e:#?}"))?;
 
-    state.lock().await.submissions.insert(
+    state.lock().unwrap().submissions.insert(
         email.clone(),
         Submission {
             name: email,

@@ -11,14 +11,9 @@ pub struct Game {
 
 #[post("/start/<name>")]
 pub async fn start(state: &AppState, name: &str) -> Result<(), Error> {
-    let mut lock = state.lock().await;
+    let mut lock = state.lock().unwrap();
 
-    let child = lock
-        .submissions
-        .get(name)
-        .ok_or(Error::NotFound)?
-        .start()
-        .await?;
+    let child = lock.submissions.get(name).ok_or(Error::NotFound)?.start()?;
 
     lock.games.insert(Uuid::new_v4(), Game { handle: child });
 
