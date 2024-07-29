@@ -1,11 +1,23 @@
 use serde::{Deserialize, Serialize};
 
+use crate::api::Error;
+
 use super::Player;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 pub enum PieceType {
     Man,
     King,
+}
+
+impl ToString for PieceType {
+    fn to_string(&self) -> String {
+        match self {
+            PieceType::Man => "M",
+            PieceType::King => "K",
+        }
+        .to_owned()
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -15,9 +27,15 @@ pub struct Piece {
     pub player: Player,
 }
 
+impl ToString for Piece {
+    fn to_string(&self) -> String {
+        format!("{}{}", self.type_.to_string(), self.player.to_string())
+    }
+}
+
 const BOARD_SIZE: usize = 8;
 
-type Board = [[Option<Piece>; BOARD_SIZE]; BOARD_SIZE];
+pub type Board = [[Option<Piece>; BOARD_SIZE]; BOARD_SIZE];
 
 fn default_board() -> Board {
     fn fill_row(board: &mut Board, row: usize, player: Player) {
@@ -42,4 +60,43 @@ fn default_board() -> Board {
     fill_row(&mut board, BOARD_SIZE - 1, Player::White);
 
     board
+}
+
+#[derive(Debug, Serialize, Clone)]
+pub struct CheckersGame {
+    pub board: Board,
+    pub current_player: Player,
+}
+
+impl Default for CheckersGame {
+    fn default() -> Self {
+        Self {
+            board: default_board(),
+            current_player: Player::White,
+        }
+    }
+}
+
+impl CheckersGame {
+    pub fn to_csv_string(&self) -> String {
+        self.board
+            .iter()
+            .map(|row| {
+                row.iter()
+                    .map(|piece| {
+                        piece
+                            .as_ref()
+                            .map_or_else(|| "".to_owned(), Piece::to_string)
+                    })
+                    .collect::<Vec<_>>()
+                    .join(";")
+            })
+            .collect::<Vec<_>>()
+            .join("\n")
+    }
+
+    pub fn apply_move(&mut self, from: (usize, usize), to: (usize, usize)) -> Result<(), Error> {
+        self.board[to.0][to.1] = self.board[from.0][from.1].take();
+        Ok(())
+    }
 }

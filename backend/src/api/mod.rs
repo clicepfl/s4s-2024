@@ -1,6 +1,6 @@
 use play::Game;
 use rocket::{response::Responder, routes, Route};
-use std::{collections::HashMap, sync::Mutex};
+use std::{collections::HashMap, sync::Arc};
 use submissions::Submission;
 use uuid::Uuid;
 
@@ -11,10 +11,10 @@ pub mod submissions;
 #[derive(Default, Debug)]
 pub struct State {
     pub submissions: HashMap<String, Submission>,
-    pub games: HashMap<Uuid, Game>,
+    pub games: HashMap<Uuid, Arc<rocket::tokio::sync::Mutex<Game>>>,
 }
 
-pub type AppState = rocket::State<Mutex<State>>;
+pub type AppState = rocket::State<std::sync::Mutex<State>>;
 
 pub fn routes() -> Vec<Route> {
     routes![submissions::post_submission, play::start]
@@ -24,6 +24,8 @@ pub enum Error {
     IO(std::io::Error),
     InvalidLanguage,
     NotFound,
+    InvalidMove,
+    AIFailed,
 }
 
 impl<'r, 'o: 'r> Responder<'r, 'o> for Error {
@@ -34,6 +36,8 @@ impl<'r, 'o: 'r> Responder<'r, 'o> for Error {
             Error::IO(_) => Status::InternalServerError,
             Error::InvalidLanguage => Status::BadRequest,
             Error::NotFound => Status::NotFound,
+            Error::InvalidMove => Status::BadRequest,
+            Error::AIFailed => Status::NotAcceptable,
         })
     }
 }
