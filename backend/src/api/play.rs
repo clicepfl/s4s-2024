@@ -4,7 +4,7 @@ use super::{AppState, Error};
 use crate::game::{checker::CheckersGame, Player};
 use async_process::{Child, ChildStdin, ChildStdout};
 use rocket::{
-    futures::{io::BufReader, lock, AsyncBufReadExt, AsyncWriteExt},
+    futures::{io::BufReader, AsyncBufReadExt, AsyncWriteExt},
     post,
     serde::json::Json,
     tokio::sync::Mutex,

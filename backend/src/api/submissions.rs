@@ -8,7 +8,7 @@ use std::{path::PathBuf, process::Stdio, str::FromStr};
 
 #[derive(Debug)]
 enum Language {
-    CPP,
+    Cpp,
     Java,
     Python,
 }
@@ -18,7 +18,7 @@ impl FromStr for Language {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "cpp" => Ok(Self::CPP),
+            "cpp" => Ok(Self::Cpp),
             "java" => Ok(Self::Java),
             "python" => Ok(Self::Python),
             _ => Err(Error::InvalidLanguage),

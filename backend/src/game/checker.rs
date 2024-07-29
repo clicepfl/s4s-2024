@@ -1,3 +1,5 @@
+use std::fmt::{Display, Write};
+
 use serde::{Deserialize, Serialize};
 
 use crate::api::Error;
@@ -10,13 +12,12 @@ pub enum PieceType {
     King,
 }
 
-impl ToString for PieceType {
-    fn to_string(&self) -> String {
-        match self {
-            PieceType::Man => "M",
-            PieceType::King => "K",
-        }
-        .to_owned()
+impl Display for PieceType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_char(match self {
+            PieceType::Man => 'M',
+            PieceType::King => 'K',
+        })
     }
 }
 
@@ -27,9 +28,9 @@ pub struct Piece {
     pub player: Player,
 }
 
-impl ToString for Piece {
-    fn to_string(&self) -> String {
-        format!("{}{}", self.type_.to_string(), self.player.to_string())
+impl Display for Piece {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}{}", self.type_, self.player)
     }
 }
 
