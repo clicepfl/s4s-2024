@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use super::{AppState, Error};
-use crate::game::{checker::CheckersGame, Player};
+use crate::game::{GameState, Player};
 use async_process::{Child, ChildStdin, ChildStdout};
 use rocket::{
     futures::{io::BufReader, AsyncBufReadExt, AsyncWriteExt},
@@ -17,7 +17,7 @@ pub struct Game {
     handle: Child,
     stdin: ChildStdin,
     stdout: BufReader<ChildStdout>,
-    checkers: CheckersGame,
+    checkers: GameState,
     human_player: Player,
 }
 
@@ -55,11 +55,11 @@ impl Game {
 }
 
 #[post("/game/start/<name>?<start>")]
-pub async fn start(state: &AppState, name: &str, start: bool) -> Result<Json<CheckersGame>, Error> {
+pub async fn start(state: &AppState, name: &str, start: bool) -> Result<Json<GameState>, Error> {
     let mut lock = state.lock().unwrap();
 
     let mut child = lock.submissions.get(name).ok_or(Error::NotFound)?.start()?;
-    let checkers: CheckersGame = Default::default();
+    let checkers: GameState = Default::default();
 
     lock.games.insert(
         Uuid::new_v4(),
@@ -86,7 +86,7 @@ pub async fn play(
     state: &AppState,
     uid: Uuid,
     moves: Json<Vec<Move>>,
-) -> Result<Json<CheckersGame>, Error> {
+) -> Result<Json<GameState>, Error> {
     let game = state.lock().unwrap().games.get(&uid).map(Arc::clone);
 
     if game.is_none() {

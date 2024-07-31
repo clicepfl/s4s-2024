@@ -4,7 +4,20 @@ use serde::{Deserialize, Serialize};
 
 use crate::api::Error;
 
-use super::Player;
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Player {
+    White,
+    Black,
+}
+
+impl Display for Player {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_char(match self {
+            Player::White => 'W',
+            Player::Black => 'B',
+        })
+    }
+}
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 pub enum PieceType {
@@ -64,12 +77,12 @@ fn default_board() -> Board {
 }
 
 #[derive(Debug, Serialize, Clone)]
-pub struct CheckersGame {
+pub struct GameState {
     pub board: Board,
     pub current_player: Player,
 }
 
-impl Default for CheckersGame {
+impl Default for GameState {
     fn default() -> Self {
         Self {
             board: default_board(),
@@ -78,7 +91,7 @@ impl Default for CheckersGame {
     }
 }
 
-impl CheckersGame {
+impl GameState {
     pub fn to_csv_string(&self) -> String {
         self.board
             .iter()
