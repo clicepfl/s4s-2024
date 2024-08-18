@@ -130,9 +130,7 @@ main {
   .editor {
     width: 50%;
     overflow: hidden;
-
-    .monaco-editor {
-      padding-top: 2em;
-    }
+    padding-top: 2em;
+    background-color: #1e1e1e;
   }
 }
