@@ -2,6 +2,7 @@ import Head from "next/head";
 import { Inter } from "next/font/google";
 import Editor from "@monaco-editor/react";
 import { useState } from "react";
+import Board from "@/components/Board";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,9 +26,20 @@ const files: {
   },
 };
 
+const exampleBoardState = `,,,,,,,
+,,KB,,,,,
+,,,,,,,
+,,,,,MW,MW,
+,,MB,,,,,
+,,,,,KW,,
+,,,,,,,
+,,,,,,,`;
+
 export default function Home() {
   const [selectedLang, setLang] = useState("java");
   const file = files[selectedLang];
+
+  const [value, setValue] = useState(file.value);
 
   return (
     <>
@@ -55,8 +67,13 @@ export default function Home() {
         </div>
 
         <div className="main-content">
-          <div className="instructions">
-            <p>Instructions here</p>
+          <div className="side-panel">
+            <div className="instructions">
+              <p>Instructions here</p>
+            </div>
+            <div className="simulation">
+              <Board boardState={exampleBoardState} />
+            </div>
           </div>
           <div className="editor">
             <Editor
@@ -65,6 +82,8 @@ export default function Home() {
               path={file.name}
               defaultLanguage={file.language}
               defaultValue={file.value}
+              value={value}
+              onChange={(va) => setValue(va ?? "")}
             />
           </div>
         </div>

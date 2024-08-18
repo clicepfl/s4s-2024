@@ -1,0 +1,62 @@
+// Board
+
+/*
+  Note : board size is dynamic to parent width
+*/
+
+
+.board {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+
+  .row {
+    display: flex;
+    width: 100%;
+    height: 12.5%;
+
+    .cell {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 12.5%;
+      height: 100%;
+
+      &.blackcell {
+        background-color: #2b201a;
+        .B {
+          outline: 2px solid #fff;
+        }
+      }
+
+      &.whitecell {
+        background-color: #fee3c3;
+        .W {
+          outline: 2px solid #000;
+        }
+      }
+
+      .piece {
+        width: 70%;
+        height: 70%;
+        border-radius: 50%;
+
+        &.B {
+          background-color: #000;
+        }
+
+        &.W {
+          background-color: #fff;
+        }
+
+        .crown {
+          width: 100%;
+          height: 100%;
+          background-color: #5a5cea;
+          mask: url("../../public/crown.svg") no-repeat center / 60% 60%;
+        }
+      }
+    }
+  }
+}
