@@ -1,0 +1,47 @@
+// Login
+
+.login {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    padding: 2em;
+    border-radius: var(--border-radius);
+    background-color: var(--secondary-background-color);
+
+    h1 {
+      text-align: center;
+      margin-bottom: 0.5em;
+    }
+
+    input {
+      padding: 0.5em;
+      border-radius: var(--border-radius);
+      border: 2px solid var(--foreground-color);
+      background-color: var(--background-color);
+      outline: none;
+    }
+
+    button {
+      padding: 0.5em;
+      border-radius: var(--border-radius);
+      border: 2px solid var(--foreground-color);
+      background-color: var(--foreground-color);
+      color: var(--background-color);
+      font-weight: bold;
+      cursor: pointer;
+      outline: none;
+
+      &:hover {
+        background: var(--secondary-background-color);
+        color: var(--foreground-color);
+      }
+    }
+  }
+}
