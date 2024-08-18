@@ -122,12 +122,14 @@ main {
 
   .instructions {
     width: 50%;
+
     background-color: var(--secondary-background-color);
     padding: 2em;
   }
 
   .editor {
     width: 50%;
+    overflow: hidden;
 
     .monaco-editor {
       padding-top: 2em;
