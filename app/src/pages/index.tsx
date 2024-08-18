@@ -1,10 +1,34 @@
 import Head from "next/head";
 import { Inter } from "next/font/google";
 import Editor from "@monaco-editor/react";
+import { useState } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
+const files: {
+  [key: string]: { name: string; language: string; value: string };
+} = {
+  java: {
+    name: "Java",
+    language: "java",
+    value: "",
+  },
+  "c++": {
+    name: "C++",
+    language: "c++",
+    value: "",
+  },
+  python: {
+    name: "Python",
+    language: "python",
+    value: "",
+  },
+};
+
 export default function Home() {
+  const [selectedLang, setLang] = useState("c++");
+  const file = files[selectedLang];
+
   return (
     <>
       <Head>
@@ -18,7 +42,11 @@ export default function Home() {
           <h1>Workshop Jeu de Dames</h1>
           <div className="toolbar">
             <button className="run-button">Run</button>
-            <select className="lang-select">
+            <select
+              className="lang-select"
+              value={selectedLang}
+              onChange={(e) => setLang(e.target.value)}
+            >
               <option value="java">Java</option>
               <option value="c++">C++</option>
               <option value="python">Python</option>
@@ -34,8 +62,9 @@ export default function Home() {
             <Editor
               theme="vs-dark"
               loading="Loading Editor..."
-              defaultLanguage="java"
-              defaultValue={""}
+              path={file.name}
+              defaultLanguage={file.language}
+              defaultValue={file.value}
             />
           </div>
         </div>
