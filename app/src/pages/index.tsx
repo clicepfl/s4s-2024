@@ -13,13 +13,32 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
       <main>
-        <Editor
-          className="editor"
-          height="70vh"
-          loading="Loading Editor..."
-          defaultLanguage="java"
-          defaultValue={""}
-        />
+        <div className="topbar">
+          <img className="logo" src="clic.svg" />
+          <h1>Workshop Jeu de Dames</h1>
+          <div className="toolbar">
+            <button className="run-button">Run</button>
+            <select className="lang-select">
+              <option value="java">Java</option>
+              <option value="c++">C++</option>
+              <option value="python">Python</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="main-content">
+          <div className="instructions">
+            <p>Instructions here</p>
+          </div>
+          <div className="editor">
+            <Editor
+              theme="vs-dark"
+              loading="Loading Editor..."
+              defaultLanguage="java"
+              defaultValue={""}
+            />
+          </div>
+        </div>
       </main>
     </>
   );
