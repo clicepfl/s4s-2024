@@ -11,22 +11,22 @@ const files: {
   java: {
     name: "Java",
     language: "java",
-    value: "",
+    value: "// Java",
   },
-  "c++": {
+  cpp: {
     name: "C++",
-    language: "c++",
-    value: "",
+    language: "cpp",
+    value: "// C++",
   },
   python: {
     name: "Python",
     language: "python",
-    value: "",
+    value: "# Python",
   },
 };
 
 export default function Home() {
-  const [selectedLang, setLang] = useState("c++");
+  const [selectedLang, setLang] = useState("java");
   const file = files[selectedLang];
 
   return (
@@ -48,7 +48,7 @@ export default function Home() {
               onChange={(e) => setLang(e.target.value)}
             >
               <option value="java">Java</option>
-              <option value="c++">C++</option>
+              <option value="cpp">C++</option>
               <option value="python">Python</option>
             </select>
           </div>
