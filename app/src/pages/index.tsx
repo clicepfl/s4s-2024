@@ -26,14 +26,16 @@ const files: {
   },
 };
 
-const exampleBoardState = `,,,,,,,
-,,KB,,,,,
-,,,,,,,
-,,,,,MW,MW,
-,,MB,,,,,
-,,,,,KW,,
-,,,,,,,
-,,,,,,,`;
+const exampleBoardState = `,,,,,,,,,
+,,KB,,,,,,,
+,,,,,,,,,
+,,,,,MW,MW,,,
+,,MB,,,,,,,
+,,,,,KW,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,`;
 
 export default function Home() {
   const [selectedLang, setLang] = useState("java");
