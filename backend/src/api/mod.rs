@@ -6,7 +6,6 @@ use rocket::{
 };
 use std::{collections::HashMap, sync::Arc};
 use submissions::Submission;
-use uuid::Uuid;
 
 pub mod contest;
 pub mod play;
@@ -17,7 +16,7 @@ const SESSION_COOKIE: &str = "SESSION";
 #[derive(Default, Debug)]
 pub struct State {
     pub submissions: HashMap<String, Submission>,
-    pub games: HashMap<Uuid, Arc<rocket::tokio::sync::Mutex<Game>>>,
+    pub games: HashMap<String, Arc<rocket::tokio::sync::Mutex<Game>>>,
 }
 
 pub type AppState = rocket::State<std::sync::Mutex<State>>;

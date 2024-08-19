@@ -10,7 +10,6 @@ use rocket::{
     tokio::sync::Mutex,
 };
 use serde::Deserialize;
-use uuid::Uuid;
 
 #[derive(Debug)]
 pub struct Game {
@@ -70,7 +69,7 @@ pub async fn start(
     let checkers: GameState = Default::default();
 
     lock.games.insert(
-        Uuid::new_v4(),
+        user.name,
         Arc::new(Mutex::new(Game {
             stdin: child.stdin.take().unwrap(),
             stdout: BufReader::new(child.stdout.take().unwrap()),
@@ -93,13 +92,13 @@ pub struct Move {
     pub to: (usize, usize),
 }
 
-#[post("/game/<uid>", format = "json", data = "<moves>")]
+#[post("/game", format = "json", data = "<moves>")]
 pub async fn play(
     state: &AppState,
-    uid: Uuid,
+    user: User,
     moves: Json<Vec<Move>>,
 ) -> Result<Json<GameState>, Error> {
-    let game = state.lock().unwrap().games.get(&uid).map(Arc::clone);
+    let game = state.lock().unwrap().games.get(&user.name).map(Arc::clone);
 
     if game.is_none() {
         return Err(Error::NotFound);
@@ -114,9 +113,9 @@ pub async fn play(
     Ok(Json(lock.checkers.clone()))
 }
 
-#[post("/game/<uid>/stop")]
-pub async fn stop(state: &AppState, uid: Uuid) -> Result<(), Error> {
-    let game = state.lock().unwrap().games.remove(&uid);
+#[post("/game/stop")]
+pub async fn stop(state: &AppState, user: User) -> Result<(), Error> {
+    let game = state.lock().unwrap().games.remove(&user.name);
 
     if game.is_none() {
         return Err(Error::NotFound);

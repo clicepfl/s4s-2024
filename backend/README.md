@@ -6,7 +6,7 @@ The name of the user must be saved in the `SESSION` cookie as plain text, and pa
 
 ### POST `/game/start?<is_first_player>`
 
-Creates a game against the user's submission
+Creates a game against the user's submission.
 
 #### Query parameters
 
@@ -22,10 +22,6 @@ The initial `GameState`.
 
 Get the current state of the game.
 
-### Path parameters
-
-- `uid (Uuid)`: The unique id of the game.
-
 ### Response
 
 The current `GameState`.
@@ -36,10 +32,6 @@ The current `GameState`.
 
 Plays a sequence of moves. The moves must match the game's rules. Must be used when it is the user's turn.
 
-### Path parameters
-
-- `uid (Uuid)`: The unique id of the game.
-
 ### Request Body
 
 ```ts
@@ -49,6 +41,12 @@ type Body = { from: [number, number]; to: [number, number] }[];
 ### Response
 
 The `GameState` after the AI has played.
+
+---
+
+### POST `/game/stop`
+
+Stops the current game.
 
 ---
 
