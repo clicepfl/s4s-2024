@@ -6,7 +6,7 @@ The name of the user must be saved in the `SESSION` cookie as plain text, and pa
 
 ### POST `/game/start?<is_first_player>`
 
-Creates a game against the user's submission.
+Creates a game against the user's submission. Fails if the user already has a game in progress.
 
 #### Query parameters
 

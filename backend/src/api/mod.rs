@@ -33,6 +33,7 @@ pub enum Error {
     InvalidMove,
     AIFailed,
     Unauthorized,
+    GameAlreadyInProgress,
 }
 
 impl<'r, 'o: 'r> Responder<'r, 'o> for Error {
@@ -41,9 +42,10 @@ impl<'r, 'o: 'r> Responder<'r, 'o> for Error {
 
         Err(match self {
             Error::IO(_) => Status::InternalServerError,
-            Error::InvalidLanguage => Status::BadRequest,
             Error::NotFound => Status::NotFound,
-            Error::InvalidMove => Status::BadRequest,
+            Error::InvalidMove | Error::GameAlreadyInProgress | Error::InvalidLanguage => {
+                Status::BadRequest
+            }
             Error::AIFailed => Status::NotAcceptable,
             Error::Unauthorized => Status::Unauthorized,
         })

@@ -53,13 +53,17 @@ impl Game {
     }
 }
 
-#[post("/game/start/<is_first_player>")]
+#[post("/game/start?<is_first_player>")]
 pub async fn start(
     state: &AppState,
     user: User,
     is_first_player: bool,
 ) -> Result<Json<GameState>, Error> {
     let mut lock = state.lock().unwrap();
+
+    if lock.games.contains_key(&user.name) {
+        return Err(Error::GameAlreadyInProgress);
+    }
 
     let mut child = lock
         .submissions
