@@ -6,6 +6,13 @@
 
 
 .board {
+
+  --dark-cell-color: #2b201a;
+  --light-cell-color: #fee3c3;
+  --black-piece-color: #090d24;
+  --white-piece-color: #f6f8ff;
+  --crown-color: #5a5cea;
+
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -26,16 +33,16 @@
       height: 100%;
 
       &.blackcell {
-        background-color: #2b201a;
+        background-color: var(--dark-cell-color);
         .B {
-          outline: 2px solid #fff;
+          outline: 2px solid var(--white-piece-color);
         }
       }
 
       &.whitecell {
-        background-color: #fee3c3;
+        background-color: var(--light-cell-color);
         .W {
-          outline: 2px solid #000;
+          outline: 2px solid var(--black-piece-color);
         }
       }
 
@@ -45,17 +52,17 @@
         border-radius: 50%;
 
         &.B {
-          background-color: #000;
+          background-color: var(--black-piece-color);
         }
 
         &.W {
-          background-color: #fff;
+          background-color: var(--white-piece-color);
         }
 
         .crown {
           width: 100%;
           height: 100%;
-          background-color: #5a5cea;
+          background-color: var(--crown-color);
           mask: url("../../public/crown.svg") no-repeat center / 60% 60%;
         }
       }
