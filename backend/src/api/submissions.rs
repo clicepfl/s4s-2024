@@ -1,4 +1,4 @@
-use super::{AppState, Error};
+use super::{AppState, Error, User};
 use async_process::{Child, Command};
 use rocket::{
     post,
@@ -55,16 +55,16 @@ impl Submission {
     }
 }
 
-#[post("/submissions?<email>&<lang>", data = "<code>")]
+#[post("/submission?<lang>", data = "<code>")]
 pub async fn post_submission(
-    email: String,
+    user: User,
     lang: String,
     code: &[u8],
     state: &AppState,
 ) -> Result<(), Error> {
     let lang = Language::from_str(lang.as_str())?;
 
-    let path = PathBuf::from_str(format!("/data/{email}").as_str()).unwrap();
+    let path = PathBuf::from_str(format!("/data/{}", user.name).as_str()).unwrap();
 
     File::create(path.clone())
         .await
@@ -74,9 +74,9 @@ pub async fn post_submission(
         .inspect_err(|e| println!("{e:#?}"))?;
 
     state.lock().unwrap().submissions.insert(
-        email.clone(),
+        user.name.clone(),
         Submission {
-            name: email,
+            name: user.name,
             lang,
             code: path,
         },

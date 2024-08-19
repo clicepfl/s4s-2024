@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use super::{AppState, Error};
+use super::{AppState, Error, User};
 use crate::game::{GameState, Player};
 use async_process::{Child, ChildStdin, ChildStdout};
 use rocket::{
@@ -54,11 +54,19 @@ impl Game {
     }
 }
 
-#[post("/game/start/<name>?<start>")]
-pub async fn start(state: &AppState, name: &str, start: bool) -> Result<Json<GameState>, Error> {
+#[post("/game/start/<is_first_player>")]
+pub async fn start(
+    state: &AppState,
+    user: User,
+    is_first_player: bool,
+) -> Result<Json<GameState>, Error> {
     let mut lock = state.lock().unwrap();
 
-    let mut child = lock.submissions.get(name).ok_or(Error::NotFound)?.start()?;
+    let mut child = lock
+        .submissions
+        .get(&user.name)
+        .ok_or(Error::NotFound)?
+        .start()?;
     let checkers: GameState = Default::default();
 
     lock.games.insert(
@@ -67,7 +75,11 @@ pub async fn start(state: &AppState, name: &str, start: bool) -> Result<Json<Gam
             stdin: child.stdin.take().unwrap(),
             stdout: BufReader::new(child.stdout.take().unwrap()),
             handle: child,
-            human_player: if start { Player::White } else { Player::Black },
+            human_player: if is_first_player {
+                Player::White
+            } else {
+                Player::Black
+            },
             checkers: checkers.clone(),
         })),
     );

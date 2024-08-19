@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use crate::api::Error;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
 pub enum Player {
     White,
     Black,
@@ -20,6 +21,7 @@ impl Display for Player {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
+#[serde(rename_all = "camelCase")]
 pub enum PieceType {
     Man,
     King,
