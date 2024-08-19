@@ -12,7 +12,7 @@ Creates a game against the user's submission. Fails if the user already has a ga
 
 - `is_first_player (bool)`: Whether the user is the first player.
 
-#### Response Body
+#### Response
 
 The initial `GameState`.
 
@@ -47,6 +47,18 @@ The `GameState` after the AI has played.
 ### POST `/game/stop`
 
 Stops the current game.
+
+---
+
+### GET `/submission`
+
+Retrieves the user's submission.
+
+### Response
+
+```ts
+type Body = { lang: "cpp" | "java" | "python"; code: string };
+```
 
 ---
 
