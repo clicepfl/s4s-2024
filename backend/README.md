@@ -62,6 +62,13 @@ Updates the user's submissions.
 
 The code as plain text.
 
+## Errors
+
+Errors are returned as status code. Most notable ones are:
+
+- `401 Unauthorized`: Missing session cookie.
+- `406 Not acceptable`: The AI has failed to provide a valid move.
+
 ## Models
 
 ```ts
