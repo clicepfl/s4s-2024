@@ -31,7 +31,7 @@ export function requireSession<T extends { [key: string]: any }>(
 
 async function apiCall(
   uri: string,
-  { body, session, method }: { body?: any; session?: string; method?: string }
+  { session, body, method }: { session?: string; body?: any; method?: string }
 ) {
   let headers = {};
   if (body !== undefined) {
@@ -49,32 +49,44 @@ async function apiCall(
 }
 
 export async function createGame(
+  session: string,
   isFirstPlayer: boolean
 ): Promise<GameState | Error> {
   return await (
     await apiCall(`game/start?is_first_player=${isFirstPlayer}`, {
+      session,
       method: "POST",
     })
   ).json();
 }
 
-export async function getGameState(): Promise<GameState | Error> {
-  return await (await apiCall("game", { method: "GET" })).json();
+export async function getGameState(
+  session: string
+): Promise<GameState | Error> {
+  return await (await apiCall("game", { session, method: "GET" })).json();
 }
 
 export async function makeMove(
-  moves: MoveSequence
+  moves: MoveSequence,
+  session: string
 ): Promise<GameState | Error> {
-  return await (await apiCall("game", { body: moves, method: "POST" })).json();
+  return await (
+    await apiCall("game", { session, body: moves, method: "POST" })
+  ).json();
 }
 
-export async function stopGame(): Promise<void> {
-  await apiCall("game/stop", { method: "POST" });
+export async function stopGame(session: string): Promise<void> {
+  await apiCall("game/stop", { session, method: "POST" });
 }
 
 export async function submitCode(
   language: SubmissionLanguage,
-  code: string
+  code: string,
+  session: string
 ): Promise<void> {
-  await apiCall(`submission?lang=${language}`, { body: code, method: "POST" });
+  await apiCall(`submission?lang=${language}`, {
+    session,
+    body: code,
+    method: "POST",
+  });
 }
