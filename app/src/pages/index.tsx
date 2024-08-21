@@ -98,7 +98,7 @@ export default function Home({ username }: { username: string }) {
               path={selectedLang}
               defaultLanguage={selectedLang}
               value={files[selectedLang].value}
-              onChange={(va) => (va ? updateCode(selectedLang, va) : null)}
+              onChange={(code) => (code ? updateCode(selectedLang, code) : null)}
             />
           </div>
         </div>
