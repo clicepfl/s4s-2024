@@ -206,67 +206,13 @@ function calculateMoves(
   return moves;
 }
 
-function calculateMovablePieces(board: Board, player: Player) {
-  let takingPieces = [];
-  let pieces = [];
-
-  for (let y = 0; y < board.length; y++) {
-    for (let x = 0; x < board[y].length; x++) {
-      const piece = board[y][x];
-      if (piece != null && piece.player === player) {
-        // Check if the piece can take another piece
-        const takeMoves = calculateTakeMoves(board, piece, x, y);
-        if (takeMoves.length > 0) {
-          takingPieces.push({ x, y });
-        } else {
-          // Check if the piece can move regularly
-          const regularMoves = calculateRegularMoves(board, piece, x, y);
-          if (regularMoves.length > 0) {
-            pieces.push({ x, y });
-          }
-        }
-      }
-    }
-  }
-
-  return takingPieces.length > 0 ? takingPieces : pieces;
-}
-
-export function calculateBoardAfterMove(
-  board: Board,
-  move: MoveWithTaken,
-  x: number,
-  y: number
-): Board {
-  const newBoard = JSON.parse(JSON.stringify(board));
-  newBoard[move.y][move.x] = board[y][x];
-  newBoard[y][x] = null;
-
-  for (const taken of move.taken) {
-    newBoard[taken.y][taken.x] = null;
-  }
-
-  return newBoard;
-}
-
-export function calculatePossibleMoves(
+function calculateMoveSequences(
   board: Board,
   piece: Piece,
   x: number,
   y: number
-): MoveWithTakenAndRaffle[] {
-
-  // Check if the piece is movable (if other pieces can take, the piece must take to be movable)
-  const movable = calculateMovablePieces(board, piece.player);
-  if (movable.find((pos) => pos.x === x && pos.y === y) == null) {
-    return [];
-  }
-
+) {
   const moves = calculateMoves(board, piece, x, y);
-
-  if (moves.length == 0) {
-    return [];
-  }
 
   let moveSequences: MoveWithTaken[][] = moves.map((move) => [move]);
 
@@ -308,6 +254,76 @@ export function calculatePossibleMoves(
       moveSequences = nextMoveSequences;
     }
   }
+
+  return moveSequences;
+}
+
+function calculateMovablePieces(board: Board, player: Player) {
+  let maxRaffleSize = 0;
+  let takingPieces: { x: number; y: number; raffleSize: number }[] = [];
+  let pieces = [];
+
+  for (let y = 0; y < board.length; y++) {
+    for (let x = 0; x < board[y].length; x++) {
+      const piece = board[y][x];
+      if (piece != null && piece.player === player) {
+        // Check if the piece can take another piece
+        const takeMoves = calculateTakeMoves(board, piece, x, y);
+        if (takeMoves.length > 0) {
+          let raffleSizes = calculateMoveSequences(board, piece, x, y).map(
+            (moveSequence) => moveSequence.length
+          );
+          let raffleSize = Math.max(...raffleSizes);
+          if (raffleSize > maxRaffleSize) {
+            maxRaffleSize = raffleSize;
+            takingPieces = [{ x, y, raffleSize }];
+          } else if (raffleSize === maxRaffleSize) {
+            takingPieces.push({ x, y, raffleSize });
+          }
+        } else {
+          // Check if the piece can move regularly
+          const regularMoves = calculateRegularMoves(board, piece, x, y);
+          if (regularMoves.length > 0) {
+            pieces.push({ x, y });
+          }
+        }
+      }
+    }
+  }
+
+  return takingPieces.length > 0 ? takingPieces : pieces;
+}
+
+export function calculateBoardAfterMove(
+  board: Board,
+  move: MoveWithTaken,
+  x: number,
+  y: number
+): Board {
+  const newBoard = JSON.parse(JSON.stringify(board));
+  newBoard[move.y][move.x] = board[y][x];
+  newBoard[y][x] = null;
+
+  for (const taken of move.taken) {
+    newBoard[taken.y][taken.x] = null;
+  }
+
+  return newBoard;
+}
+
+export function calculatePossibleMoves(
+  board: Board,
+  piece: Piece,
+  x: number,
+  y: number
+): MoveWithTakenAndRaffle[] {
+  // Check if the piece is movable (if other pieces can take, the piece must take to be movable)
+  const movable = calculateMovablePieces(board, piece.player);
+  if (movable.find((pos) => pos.x === x && pos.y === y) == null) {
+    return [];
+  }
+
+  let moveSequences = calculateMoveSequences(board, piece, x, y);
 
   return moveSequences.map((moveSequence) => {
     return { ...moveSequence[0], raffle: moveSequence.length > 1 };

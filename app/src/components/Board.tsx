@@ -50,7 +50,7 @@ const testInitialBoard: BoardState = [
     null,
     { player: Player.Black, type: PieceType.Man },
     null,
-    { player: Player.Black, type: PieceType.Man },
+    null,
     null,
     { player: Player.Black, type: PieceType.Man },
     null,
@@ -69,7 +69,18 @@ const testInitialBoard: BoardState = [
     null,
   ],
   [null, null, null, null, null, null, null, null, null, null],
-  [null, null, null, null, null, null, null, null, null, null],
+  [
+    null,
+    null,
+    { player: Player.Black, type: PieceType.Man },
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+  ],
   [
     null,
     { player: Player.White, type: PieceType.Man },
@@ -144,19 +155,17 @@ export default function Board({ player }: BoardProps) {
           (move) => move.x == x && move.y == y
         );
         if (playedMove != null) {
-          // move piece
-          setBoard((prevBoard) =>
-            calculateBoardAfterMove(
-              prevBoard,
-              playedMove,
-              selectedPiece.x,
-              selectedPiece.y
-            )
+          let nextBoard = calculateBoardAfterMove(
+            board,
+            playedMove,
+            selectedPiece.x,
+            selectedPiece.y
           );
-
+          // move piece
+          setBoard(nextBoard);
           if (playedMove.raffle) {
             setSelectedPiece({ x, y });
-            setPossibleMoves(calculatePossibleMoves(board, piece, x, y));
+            setPossibleMoves(calculatePossibleMoves(nextBoard, piece, x, y));
           } else {
             setSelectedPiece(null);
             setPossibleMoves([]);
