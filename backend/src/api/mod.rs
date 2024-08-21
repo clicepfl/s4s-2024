@@ -25,6 +25,7 @@ pub fn routes() -> Vec<Route> {
     routes![
         submissions::get_submission,
         submissions::post_submission,
+        play::get_game,
         play::start,
         play::stop,
         play::play,

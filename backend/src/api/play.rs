@@ -5,7 +5,7 @@ use crate::game::{GameState, Player};
 use async_process::{Child, ChildStdin, ChildStdout};
 use rocket::{
     futures::{io::BufReader, AsyncBufReadExt, AsyncWriteExt},
-    post,
+    get, post,
     serde::json::Json,
     tokio::sync::Mutex,
 };
@@ -51,6 +51,21 @@ impl Game {
 
         Ok(())
     }
+}
+
+#[get("/game")]
+pub async fn get_game(state: &AppState, user: User) -> Result<Json<GameState>, Error> {
+    let game = {
+        let mutex = {
+            let lock = state.lock()?;
+            lock.games.get(&user.name).ok_or(Error::NotFound)?.clone()
+        };
+
+        let lock = mutex.lock().await;
+        lock.checkers.clone()
+    };
+
+    Ok(Json(game))
 }
 
 #[post("/game/start?<is_first_player>")]
