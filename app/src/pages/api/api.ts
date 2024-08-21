@@ -4,10 +4,7 @@ import {
   GetServerSidePropsResult,
 } from "next";
 import { API_URL, SESSION_COOKIE_NAME } from "./config";
-import { GameState } from "./models";
-
-type MoveSequence = { from: [number, number]; to: [number, number] }[];
-type SubmissionLanguage = "python" | "java" | "cpp";
+import { GameState, MoveSequence, SubmissionLanguage } from "./models";
 
 export function requireSession<T extends { [key: string]: any }>(
   onSuccess: (
