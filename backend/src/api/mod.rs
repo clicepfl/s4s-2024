@@ -11,8 +11,6 @@ pub mod contest;
 pub mod play;
 pub mod submissions;
 
-const SESSION_COOKIE: &str = "SESSION";
-
 #[derive(Default, Debug)]
 pub struct State {
     pub submissions: HashMap<String, Submission>,
@@ -83,9 +81,13 @@ impl<'r> FromRequest<'r> for User {
     type Error = self::Error;
 
     async fn from_request(req: &'r Request<'_>) -> request::Outcome<Self, Self::Error> {
-        if let Some(name) = req.cookies().get(SESSION_COOKIE) {
+        if let Some(name) = req
+            .headers()
+            .get_one("Authorization")
+            .and_then(|header| header.strip_prefix("Bearer "))
+        {
             request::Outcome::Success(User {
-                name: name.value().to_owned(),
+                name: name.to_owned(),
             })
         } else {
             request::Outcome::Error((rocket::http::Status::Unauthorized, Error::Unauthorized))

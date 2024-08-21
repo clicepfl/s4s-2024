@@ -1,6 +1,10 @@
 # API
 
-The name of the user must be saved in the `SESSION` cookie as plain text, and passed to each request.
+The name of the user must be given for each request in the `Authorization` header as follow:
+
+```
+Authorization: Bearer <name>
+```
 
 ## Endpoints
 
@@ -57,7 +61,7 @@ Retrieves the user's submission.
 ### Response
 
 ```ts
-type Body = { lang: "cpp" | "java" | "python"; code: string };
+type Body = { lang: 'cpp' | 'java' | 'python'; code: string };
 ```
 
 ---
@@ -97,12 +101,12 @@ interface Piece {
 }
 
 enum Player {
-  White = "white",
-  Black = "black",
+  White = 'white',
+  Black = 'black',
 }
 
 enum PieceType {
-  Man = "man",
-  King = "king",
+  Man = 'man',
+  King = 'king',
 }
 ```
