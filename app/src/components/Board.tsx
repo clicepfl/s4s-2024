@@ -2,15 +2,14 @@
 // and renders it
 
 import React from "react";
+import { Board as BoardState, Piece, Player, PieceType } from "./../pages/api/models";
 
 type BoardProps = {
-  boardState: string;
+  board: BoardState;
 };
 
-export default function Board({ boardState }: BoardProps) {
+export default function Board({ board }: BoardProps) {
   const renderBoard = () => {
-    // Parse the CSV board state into a 2D array
-    const board = boardState.split("\n").map((row) => row.split(","));
 
     // Render the checkers board
     return (
@@ -24,11 +23,11 @@ export default function Board({ boardState }: BoardProps) {
                   cellIndex % 2 === rowIndex % 2 ? "whitecell" : "blackcell"
                 }`}
               >
-                {cell === "" ? (
+                {cell == null ? (
                   ""
                 ) : (
-                  <div className={`piece ${cell.split("").join(" ")}`}>
-                    {cell.indexOf("K") != -1 ? (
+                  <div className={`piece ${cell.player}`}>
+                    {cell.type == PieceType.King ? (
                       <div className="crown"></div>
                     ) : (
                       ""
