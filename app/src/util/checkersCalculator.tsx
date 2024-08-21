@@ -1,4 +1,4 @@
-import { Board, Piece, PieceType } from "../pages/api/models";
+import { Board, Piece, PieceType, Player } from "../pages/api/models";
 
 export type MoveWithTaken = {
   x: number;
@@ -206,6 +206,32 @@ function calculateMoves(
   return moves;
 }
 
+function calculateMovablePieces(board: Board, player: Player) {
+  let takingPieces = [];
+  let pieces = [];
+
+  for (let y = 0; y < board.length; y++) {
+    for (let x = 0; x < board[y].length; x++) {
+      const piece = board[y][x];
+      if (piece != null && piece.player === player) {
+        // Check if the piece can take another piece
+        const takeMoves = calculateTakeMoves(board, piece, x, y);
+        if (takeMoves.length > 0) {
+          takingPieces.push({ x, y });
+        } else {
+          // Check if the piece can move regularly
+          const regularMoves = calculateRegularMoves(board, piece, x, y);
+          if (regularMoves.length > 0) {
+            pieces.push({ x, y });
+          }
+        }
+      }
+    }
+  }
+
+  return takingPieces.length > 0 ? takingPieces : pieces;
+}
+
 export function calculateBoardAfterMove(
   board: Board,
   move: MoveWithTaken,
@@ -229,6 +255,13 @@ export function calculatePossibleMoves(
   x: number,
   y: number
 ): MoveWithTakenAndRaffle[] {
+
+  // Check if the piece is movable (if other pieces can take, the piece must take to be movable)
+  const movable = calculateMovablePieces(board, piece.player);
+  if (movable.find((pos) => pos.x === x && pos.y === y) == null) {
+    return [];
+  }
+
   const moves = calculateMoves(board, piece, x, y);
 
   if (moves.length == 0) {
