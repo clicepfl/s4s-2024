@@ -22,12 +22,17 @@ pub struct State {
 pub type AppState = rocket::State<std::sync::Mutex<State>>;
 
 pub fn routes() -> Vec<Route> {
-    routes![submissions::post_submission, play::start]
+    routes![
+        submissions::get_submission,
+        submissions::post_submission,
+        play::start
+    ]
 }
 
 #[derive(Debug)]
 pub enum Error {
-    IO(std::io::Error),
+    IO,
+    Poison,
     InvalidLanguage,
     NotFound,
     InvalidMove,
@@ -41,7 +46,7 @@ impl<'r, 'o: 'r> Responder<'r, 'o> for Error {
         use rocket::http::Status;
 
         Err(match self {
-            Error::IO(_) => Status::InternalServerError,
+            Error::IO | Error::Poison => Status::InternalServerError,
             Error::NotFound => Status::NotFound,
             Error::InvalidMove | Error::GameAlreadyInProgress | Error::InvalidLanguage => {
                 Status::BadRequest
@@ -54,7 +59,15 @@ impl<'r, 'o: 'r> Responder<'r, 'o> for Error {
 
 impl From<std::io::Error> for Error {
     fn from(value: std::io::Error) -> Self {
-        Self::IO(value)
+        dbg!(value);
+        Self::IO
+    }
+}
+
+impl<Guard> From<std::sync::PoisonError<Guard>> for Error {
+    fn from(value: std::sync::PoisonError<Guard>) -> Self {
+        dbg!(value);
+        Self::Poison
     }
 }
 

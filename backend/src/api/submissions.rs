@@ -1,12 +1,16 @@
 use super::{AppState, Error, User};
 use async_process::{Child, Command};
 use rocket::{
-    post,
-    tokio::{fs::File, io::AsyncWriteExt},
+    get, post, serde::json::Json, tokio::{
+        fs::File,
+        io::{AsyncReadExt, AsyncWriteExt},
+    }
 };
+use serde::{Deserialize, Serialize};
 use std::{path::PathBuf, process::Stdio, str::FromStr};
 
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy)]
+#[serde(rename_all = "lowercase")]
 enum Language {
     Cpp,
     Java,
@@ -26,7 +30,7 @@ impl FromStr for Language {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Submission {
     name: String,
     lang: Language,
@@ -53,6 +57,34 @@ impl Submission {
             _ => todo!(),
         }
     }
+}
+
+#[derive(Serialize, Debug)]
+pub struct SubmissionStatus {
+    code: String,
+    lang: Language,
+}
+
+#[get("/submission")]
+pub async fn get_submission(user: User, state: &AppState) -> Result<Json<SubmissionStatus>, Error> {
+    let submission = {
+        let lock = state.lock()?;
+        lock.submissions
+            .get(&user.name)
+            .ok_or(Error::NotFound)?
+            .clone()
+    };
+
+    let mut code = String::new();
+    File::open(submission.code)
+        .await?
+        .read_to_string(&mut code)
+        .await?;
+
+    Ok(Json(SubmissionStatus {
+        code,
+        lang: submission.lang,
+    }))
 }
 
 #[post("/submission?<lang>", data = "<code>")]
