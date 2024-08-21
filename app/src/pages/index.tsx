@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import Editor from "@monaco-editor/react";
 import { useState } from "react";
 import Board from "@/components/Board";
+import { requireSession } from "./api/api";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -37,7 +38,9 @@ const exampleBoardState = `,,,,,,,,,
 ,,,,,,,,,
 ,,,,,,,,,`;
 
-export default function Home() {
+export default function Home(
+  { username }: { username: string }
+) {
   const [selectedLang, setLang] = useState("java");
   const file = files[selectedLang];
 
@@ -71,7 +74,7 @@ export default function Home() {
         <div className="main-content">
           <div className="side-panel">
             <div className="instructions">
-              <p>Instructions here</p>
+              <p>Welcome {username} !</p>
             </div>
             <div className="simulation">
               <Board boardState={exampleBoardState} />
@@ -93,3 +96,7 @@ export default function Home() {
     </>
   );
 }
+
+export const getServerSideProps = requireSession(async (context, session) => {
+  return { props: { username: session } };
+});

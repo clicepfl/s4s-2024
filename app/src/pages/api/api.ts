@@ -9,16 +9,36 @@ import { GameState } from "./models";
 type MoveSequence = { from: [number, number]; to: [number, number] }[];
 type SubmissionLanguage = "python" | "java" | "cpp";
 
+export function requireSession<T extends { [key: string]: any }>(
+  onSuccess: (
+    context: GetServerSidePropsContext,
+    session: string
+  ) => Promise<GetServerSidePropsResult<T>>,
+  onFailure?: GetServerSideProps<T>
+): GetServerSideProps<T> {
+  return async (context) => {
+    const session = context.req.cookies[SESSION_COOKIE_NAME];
+
+    if (!session) {
+      return onFailure !== undefined
+        ? onFailure(context)
+        : { redirect: { destination: "/login", permanent: false } };
+    } else {
+      return await onSuccess(context, session);
+    }
+  };
+}
+
 async function apiCall(
   uri: string,
-  { body, token, method }: { body?: any; token?: string; method?: string }
+  { body, session, method }: { body?: any; session?: string; method?: string }
 ) {
   let headers = {};
   if (body !== undefined) {
     headers = { ...headers, "Content-Type": "application/json" };
   }
-  if (token !== undefined) {
-    headers = { ...headers, Authorization: `Bearer ${token}` };
+  if (session !== undefined) {
+    headers = { ...headers, Authorization: `Bearer ${session}` };
   }
 
   return await fetch(`${API_URL}/${uri}`, {
