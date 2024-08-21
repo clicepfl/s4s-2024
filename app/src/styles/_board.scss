@@ -4,9 +4,7 @@
   Note : board size is dynamic to parent width
 */
 
-
 .board {
-
   --dark-cell-color: #2b201a;
   --light-cell-color: #fee3c3;
   --black-piece-color: #090d24;
@@ -34,16 +32,24 @@
 
       &.blackcell {
         background-color: var(--dark-cell-color);
-        .B {
+        .black {
           outline: 2px solid var(--white-piece-color);
         }
       }
 
       &.whitecell {
         background-color: var(--light-cell-color);
-        .W {
+        .white {
           outline: 2px solid var(--black-piece-color);
         }
+      }
+
+      &.selected {
+        border: 2px solid #ff0000;
+      }
+
+      &.possible {
+        border: 2px solid #00ff00;
       }
 
       .piece {

@@ -3,7 +3,12 @@ import { Inter } from "next/font/google";
 import Editor from "@monaco-editor/react";
 import { useState } from "react";
 import Board from "@/components/Board";
-import { Board as BoardState, emptyBoard, SubmissionLanguage } from "./api/models";
+import {
+  Board as BoardState,
+  emptyBoard,
+  Player,
+  SubmissionLanguage,
+} from "./api/models";
 import { createGame, requireSession, stopGame, submitCode } from "./api/api";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -28,8 +33,8 @@ const initFiles: {
 export default function Home({ username }: { username: string }) {
   const [selectedLang, setLang] = useState(SubmissionLanguage.Java);
   const [files, setFiles] = useState(initFiles);
-  const [boardState, setBoardState] = useState(emptyBoard);
   const [gameOngoing, setGameOngoing] = useState(false);
+  const [player, setPlayer] = useState(Player.White);
 
   function updateCode(lang: string, value: string) {
     setFiles({ ...files, [lang]: { ...files[lang], value } });
@@ -53,7 +58,7 @@ export default function Home({ username }: { username: string }) {
                 if (gameOngoing) {
                   stopGame(username);
                 } else {
-                  createGame(username, true) // TODO: allow user to choose first player
+                  createGame(username, true); // TODO: allow user to choose first player
                 }
               }}
             >
@@ -88,7 +93,7 @@ export default function Home({ username }: { username: string }) {
               <p>Welcome {username} !</p>
             </div>
             <div className="simulation">
-              <Board board={boardState} />
+              <Board player={player} />
             </div>
           </div>
           <div className="editor">
@@ -98,7 +103,9 @@ export default function Home({ username }: { username: string }) {
               path={selectedLang}
               defaultLanguage={selectedLang}
               value={files[selectedLang].value}
-              onChange={(code) => (code ? updateCode(selectedLang, code) : null)}
+              onChange={(code) =>
+                code ? updateCode(selectedLang, code) : null
+              }
             />
           </div>
         </div>
