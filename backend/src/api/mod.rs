@@ -1,5 +1,6 @@
 use play::Game;
 use rocket::{
+    post,
     request::{self, FromRequest},
     response::Responder,
     routes, Request, Route,
@@ -28,6 +29,19 @@ pub fn routes() -> Vec<Route> {
         play::stop,
         play::play,
     ]
+}
+
+#[post("/login?<name>")]
+pub async fn login(name: &str, state: &AppState) -> rocket::http::Status {
+    let mut lock = state.lock().unwrap();
+
+    if lock.submissions.contains_key(name) {
+        rocket::http::Status::Conflict
+    } else {
+        lock.submissions
+            .insert(name.to_string(), Submission::empty(name.to_string()));
+        rocket::http::Status::Ok
+    }
 }
 
 #[derive(Debug)]

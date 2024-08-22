@@ -8,6 +8,10 @@ Authorization: Bearer <name>
 
 ## Endpoints
 
+### POST `/login?<name>`
+
+Logs in using the provided. Either returns a 200 (OK) or 409 (Conflict) HTTP code.
+
 ### POST `/game/start?<is_first_player>`
 
 Creates a game against the user's submission. Fails if the user already has a game in progress.

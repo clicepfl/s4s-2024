@@ -1,10 +1,12 @@
 use super::{AppState, Error, User};
 use async_process::{Child, Command};
 use rocket::{
-    get, post, serde::json::Json, tokio::{
+    get, post,
+    serde::json::Json,
+    tokio::{
         fs::File,
         io::{AsyncReadExt, AsyncWriteExt},
-    }
+    },
 };
 use serde::{Deserialize, Serialize};
 use std::{path::PathBuf, process::Stdio, str::FromStr};
@@ -38,6 +40,14 @@ pub struct Submission {
 }
 
 impl Submission {
+    pub fn empty(name: String) -> Self {
+        Self {
+            name,
+            lang: Language::Cpp,
+            code: Default::default(),
+        }
+    }
+
     pub fn start(&self) -> Result<Child, Error> {
         match self.lang {
             Language::Python => Command::new("docker")
