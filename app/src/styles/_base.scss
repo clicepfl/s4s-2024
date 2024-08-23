@@ -6,6 +6,7 @@
     "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
 
   --foreground-color: #090d24;
+  --secondary-foreground-color:#1d2636;
   --background-color: #fff;
   --secondary-background-color: #b1b1b1;
   --clic-red: #cb381b;
@@ -14,6 +15,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-color: #fff;
+    --secondary-foreground-color: #b1b1b1;
     --background-color: #090d24;
     --secondary-background-color: #1d2636;
   }
@@ -59,6 +61,11 @@ main {
   height: 100%;
 }
 
+.icon {
+  width: 1em;
+  height: 1em;
+}
+
 .topbar {
   display: flex;
   justify-content: space-between;
@@ -87,13 +94,22 @@ main {
 
       background: var(--foreground-color);
       color: var(--background-color);
+      stroke: var(--background-color);
       font-weight: bold;
 
       cursor: pointer;
 
       &:hover {
-        background: rgb(var(--foreground-color));
-        color: rgb(var(--background-color));
+        background: var(--background-color);
+        color: var(--foreground-color);
+        stroke: var(--foreground-color);
+      }
+
+      &:disabled {
+        background: var(--secondary-background-color);
+        color: var(--secondary-foreground-color);
+        stroke: var(--secondary-foreground-color);
+        cursor: not-allowed;
       }
     }
 

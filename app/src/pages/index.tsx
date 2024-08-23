@@ -10,6 +10,7 @@ import {
   SubmissionLanguage,
 } from "./api/models";
 import { createGame, requireSession, stopGame, submitCode } from "./api/api";
+import SwapIcon from "@/components/icons/SwapIcon";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -54,7 +55,17 @@ export default function Home({ username }: { username: string }) {
           <div className="toolbar">
             <button
               className="button"
+              disabled={gameOngoing}
+              onClick={() =>
+                setPlayer(player === Player.White ? Player.Black : Player.White)
+              }
+            >
+              <SwapIcon />
+            </button>
+            <button
+              className="button"
               onClick={() => {
+                setGameOngoing(!gameOngoing);
                 if (gameOngoing) {
                   stopGame(username);
                 } else {

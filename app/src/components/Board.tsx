@@ -1,13 +1,14 @@
 // component that takes in a checkers board (csv, M for man and K for king)
 // and renders it
 
-import React, { useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import {
   Board as BoardState,
   Piece,
   Player,
   PieceType,
   emptyBoard,
+  initialBoards,
 } from "./../pages/api/models";
 import {
   calculateBoardAfterMove,
@@ -19,120 +20,11 @@ type BoardProps = {
   player: Player;
 };
 
-const testInitialBoard: BoardState = [
-  [
-    null,
-    { player: Player.Black, type: PieceType.Man },
-    null,
-    { player: Player.Black, type: PieceType.Man },
-    null,
-    { player: Player.Black, type: PieceType.Man },
-    null,
-    { player: Player.Black, type: PieceType.Man },
-    null,
-    { player: Player.Black, type: PieceType.Man },
-  ],
-  [
-    { player: Player.Black, type: PieceType.Man },
-    null,
-    { player: Player.Black, type: PieceType.Man },
-    null,
-    { player: Player.Black, type: PieceType.Man },
-    null,
-    { player: Player.Black, type: PieceType.Man },
-    null,
-    { player: Player.Black, type: PieceType.Man },
-    null,
-  ],
-  [
-    null,
-    { player: Player.Black, type: PieceType.Man },
-    null,
-    { player: Player.Black, type: PieceType.Man },
-    null,
-    null,
-    null,
-    { player: Player.Black, type: PieceType.Man },
-    null,
-    { player: Player.Black, type: PieceType.Man },
-  ],
-  [
-    { player: Player.Black, type: PieceType.Man },
-    null,
-    { player: Player.Black, type: PieceType.Man },
-    null,
-    { player: Player.Black, type: PieceType.Man },
-    null,
-    { player: Player.Black, type: PieceType.Man },
-    null,
-    { player: Player.Black, type: PieceType.Man },
-    null,
-  ],
-  [null, null, null, null, null, null, null, null, null, null],
-  [
-    null,
-    null,
-    { player: Player.Black, type: PieceType.Man },
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-  ],
-  [
-    null,
-    { player: Player.White, type: PieceType.Man },
-    null,
-    { player: Player.White, type: PieceType.Man },
-    null,
-    { player: Player.White, type: PieceType.Man },
-    null,
-    { player: Player.White, type: PieceType.Man },
-    null,
-    { player: Player.White, type: PieceType.Man },
-  ],
-  [
-    { player: Player.White, type: PieceType.Man },
-    null,
-    { player: Player.White, type: PieceType.Man },
-    null,
-    { player: Player.White, type: PieceType.Man },
-    null,
-    { player: Player.White, type: PieceType.Man },
-    null,
-    { player: Player.White, type: PieceType.Man },
-    null,
-  ],
-  [
-    null,
-    { player: Player.White, type: PieceType.Man },
-    null,
-    { player: Player.White, type: PieceType.Man },
-    null,
-    { player: Player.White, type: PieceType.Man },
-    null,
-    { player: Player.White, type: PieceType.Man },
-    null,
-    { player: Player.White, type: PieceType.Man },
-  ],
-  [
-    { player: Player.White, type: PieceType.Man },
-    null,
-    { player: Player.White, type: PieceType.Man },
-    null,
-    { player: Player.White, type: PieceType.Man },
-    null,
-    { player: Player.White, type: PieceType.Man },
-    null,
-    { player: Player.White, type: PieceType.Man },
-    null,
-  ],
-];
-
 export default function Board({ player }: BoardProps) {
-  const [board, setBoard] = useState(testInitialBoard);
+
+  const [board, setBoard] = useState(initialBoards[player]);
+
+  useEffect(() => {setBoard(initialBoards[player])}, [player]);
 
   const [selectedPiece, setSelectedPiece] = useState<{
     x: number;
