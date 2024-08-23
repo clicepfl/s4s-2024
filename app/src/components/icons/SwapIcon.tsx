@@ -13,11 +13,10 @@ export default function SwapIcon() {
       <defs id="defs1" />
       <path
         d="M 7.28006,19 V 4 m 0,0 3.00004,3 M 7.28006,4 4.28,7.00006 M 16.7201,5 v 15 m 0,0 2.9999,-2.9999 M 16.7201,20 l -3,-2.9999"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        id="path1"
         strokeWidth={3}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        id="path1"
       />
     </svg>
   );
