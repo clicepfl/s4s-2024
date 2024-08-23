@@ -9,7 +9,13 @@ import {
   Player,
   SubmissionLanguage,
 } from "./api/models";
-import { createGame, requireSession, stopGame, submitCode } from "./api/api";
+import {
+  createGame,
+  loadSubmission,
+  requireSession,
+  stopGame,
+  submitCode,
+} from "./api/api";
 import SwapIcon from "@/components/icons/SwapIcon";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -33,12 +39,27 @@ const initFiles: {
 
 export default function Home({ username }: { username: string }) {
   const [selectedLang, setLang] = useState(SubmissionLanguage.Java);
-  const [files, setFiles] = useState(initFiles);
+  const [file, setFile] = useState(initFiles[selectedLang].value);
   const [gameOngoing, setGameOngoing] = useState(false);
   const [player, setPlayer] = useState(Player.White);
+  const [currentTurn, setCurrentTurn] = useState<Player | null>(null);
 
-  function updateCode(lang: string, value: string) {
-    setFiles({ ...files, [lang]: { ...files[lang], value } });
+  function changeLang(lang: SubmissionLanguage) {
+    if (initFiles[selectedLang].value === file) {
+      // If the current file is the default one, we can safely change the language
+      setLang(lang);
+      setFile(initFiles[lang].value);
+    } else {
+      // Otherwise, we ask for confirmation
+      if (
+        confirm(
+          "Are you sure ? Changing the language will overwrite your current code."
+        )
+      ) {
+        setLang(lang);
+        setFile(initFiles[lang].value);
+      }
+    }
   }
 
   return (
@@ -65,11 +86,20 @@ export default function Home({ username }: { username: string }) {
             <button
               className="button"
               onClick={() => {
-                setGameOngoing(!gameOngoing);
                 if (gameOngoing) {
                   stopGame(username);
+                  setGameOngoing(false);
                 } else {
-                  createGame(username, true); // TODO: allow user to choose first player
+                  createGame(username, player == Player.Black).then(
+                    (game) => {
+                      if (game instanceof Error) {
+                        alert(game.message);
+                      } else {
+                        setGameOngoing(true);
+                      }
+                    },
+                    (err) => alert(err.message)
+                  );
                 }
               }}
             >
@@ -78,20 +108,44 @@ export default function Home({ username }: { username: string }) {
             <button
               className="button"
               onClick={() =>
-                submitCode(selectedLang, files[selectedLang].value, username)
+                submitCode(selectedLang, file, username).then(
+                  () => alert("Code submitted !"),
+                  (err) => alert(err.message)
+                )
               }
             >
               Submit
             </button>
 
+            <button
+              className="button"
+              onClick={() => {
+                if (
+                  confirm(
+                    "Are you sure ? Loading your last submission will overwrite your current code."
+                  )
+                ) {
+                  loadSubmission(username).then(
+                    ({ lang, code }) => {
+                      setLang(lang);
+                      setFile(code);
+                    },
+                    (err) => alert(err.message)
+                  );
+                }
+              }}
+            >
+              Load
+            </button>
+
             <select
               className="lang-select"
               value={selectedLang}
-              onChange={(e) => setLang(e.target.value as SubmissionLanguage)}
+              onChange={(e) => changeLang(e.target.value as SubmissionLanguage)}
             >
               {Object.values(SubmissionLanguage).map((lang) => (
                 <option key={lang} value={lang}>
-                  {files[lang].name}
+                  {initFiles[lang].name}
                 </option>
               ))}
             </select>
@@ -103,20 +157,29 @@ export default function Home({ username }: { username: string }) {
             <div className="instructions">
               <p>Welcome {username} !</p>
             </div>
-            <div className="simulation">
-              <Board player={player} />
+            <div className="game">
+              <div className="simulation">
+                <Board
+                  username={username}
+                  player={player}
+                  gameOngoing={gameOngoing}
+                  currentTurn={currentTurn}
+                  setCurrentTurn={setCurrentTurn}
+                />
+              </div>
+              <div className="game-info">
+                <p>Game State: {gameOngoing ? "Ongoing" : "Stopped"}</p>
+                <p>Current Turn: {currentTurn ?? "None"}</p>
+              </div>
             </div>
           </div>
           <div className="editor">
             <Editor
               theme="vs-dark"
               loading="Loading Editor..."
-              path={selectedLang}
-              defaultLanguage={selectedLang}
-              value={files[selectedLang].value}
-              onChange={(code) =>
-                code ? updateCode(selectedLang, code) : null
-              }
+              language={selectedLang}
+              value={file}
+              onChange={(code) => (code ? setFile(code) : null)}
             />
           </div>
         </div>

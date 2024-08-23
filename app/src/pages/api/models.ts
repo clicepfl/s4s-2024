@@ -19,7 +19,7 @@ export enum PieceType {
   Man = "man",
   King = "king",
 }
-
+export type SingleMove = { from: [number, number]; to: [number, number] };
 export type MoveSequence = { from: [number, number]; to: [number, number] }[];
 
 export enum SubmissionLanguage {

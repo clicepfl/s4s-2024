@@ -6,7 +6,7 @@
     "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
 
   --foreground-color: #090d24;
-  --secondary-foreground-color:#1d2636;
+  --secondary-foreground-color: #1d2636;
   --background-color: #fff;
   --secondary-background-color: #b1b1b1;
   --clic-red: #cb381b;
@@ -165,8 +165,20 @@ main {
       width: 100%;
     }
 
-    .simulation {
-      width: 45%;
+    .game {
+      width: 100%;
+      display: flex;
+      gap: 2em;
+
+      .simulation {
+        width: 50%;
+      }
+
+      .game-info {
+        display: flex;
+        flex-direction: column;
+        gap: .5em;
+      }
     }
   }
 

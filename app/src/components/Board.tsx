@@ -9,22 +9,39 @@ import {
   PieceType,
   emptyBoard,
   initialBoards,
+  MoveSequence,
+  SingleMove,
 } from "./../pages/api/models";
 import {
   calculateBoardAfterMove,
   calculatePossibleMoves,
   MoveWithTakenAndRaffle,
 } from "@/util/checkersCalculator";
+import { makeMove } from "@/pages/api/api";
 
 type BoardProps = {
+  username: string;
   player: Player;
+  gameOngoing: boolean;
+  currentTurn: Player | null;
+  setCurrentTurn: (player: Player) => void;
 };
 
-export default function Board({ player }: BoardProps) {
-
+export default function Board({
+  username,
+  player,
+  gameOngoing,
+  currentTurn,
+  setCurrentTurn,
+}: BoardProps) {
   const [board, setBoard] = useState(initialBoards[player]);
+  const [currentMoveSequence, setCurrentMoveSequence] = useState<MoveSequence>(
+    []
+  );
 
-  useEffect(() => {setBoard(initialBoards[player])}, [player]);
+  useEffect(() => {
+    setBoard(initialBoards[player]);
+  }, [player]); // player can only change when the game is not ongoing
 
   const [selectedPiece, setSelectedPiece] = useState<{
     x: number;
@@ -34,7 +51,13 @@ export default function Board({ player }: BoardProps) {
     []
   );
 
+  // handle click on a cell
   function handleClick(x: number, y: number) {
+    if (!gameOngoing || currentTurn != player) {
+      setSelectedPiece(null);
+      setPossibleMoves([]);
+      return;
+    }
     const clickedPiece = board[y][x];
     if (clickedPiece != null && clickedPiece.player == player) {
       // select piece
@@ -42,26 +65,53 @@ export default function Board({ player }: BoardProps) {
       setPossibleMoves(calculatePossibleMoves(board, clickedPiece, x, y));
     } else if (selectedPiece != null) {
       const piece = board[selectedPiece.y][selectedPiece.x];
+
       if (piece != null) {
         let playedMove = possibleMoves.find(
           (move) => move.x == x && move.y == y
         );
         if (playedMove != null) {
+          // add move to current sequence
+          let singleMove: SingleMove = {
+            from: [selectedPiece.x, selectedPiece.y],
+            to: [x, y],
+          };
+          setCurrentMoveSequence([...currentMoveSequence, singleMove]);
+
+          // move piece on board
           let nextBoard = calculateBoardAfterMove(
             board,
             playedMove,
             selectedPiece.x,
             selectedPiece.y
           );
-          // move piece
           setBoard(nextBoard);
+
+          // check if the move sequence is finished
           if (playedMove.raffle) {
             setSelectedPiece({ x, y });
             setPossibleMoves(calculatePossibleMoves(nextBoard, piece, x, y));
           } else {
             setSelectedPiece(null);
             setPossibleMoves([]);
-            // TODO : Call AI to move
+            setCurrentTurn(
+              player == Player.White ? Player.Black : Player.White
+            ); // switch turn
+            makeMove(currentMoveSequence, username).then(
+              (game) => {
+                if (game instanceof Error) {
+                  alert(game.message);
+                } else {
+                  // TODO: add buffer time before updating board ?
+                  setBoard(game.board); // update board with server response
+                  setCurrentTurn(game.current_player);
+                }
+              },
+              (error) => {
+                console.error(error);
+              }
+            ); // send move to server
+            setCurrentMoveSequence([]); // reset move sequence
           }
         } else {
           setSelectedPiece(null);
