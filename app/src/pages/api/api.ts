@@ -45,6 +45,14 @@ async function apiCall(
   });
 }
 
+export async function login(username: string): Promise<boolean> {
+  return (
+    await apiCall(`login?name=${username}`, {
+      method: "POST",
+    })
+  ).ok;
+}
+
 export async function createGame(
   session: string,
   isFirstPlayer: boolean
@@ -74,6 +82,13 @@ export async function makeMove(
 
 export async function stopGame(session: string): Promise<void> {
   await apiCall("game/stop", { session, method: "POST" });
+}
+
+export async function loadSubmission(session: string): Promise<{
+  lang: SubmissionLanguage;
+  code: string;
+}> {
+  return await (await apiCall("submission", {session, method: "GET" })).json();
 }
 
 export async function submitCode(

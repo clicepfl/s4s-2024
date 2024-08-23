@@ -2,17 +2,23 @@ import { useRouter } from "next/router";
 import { useCookies } from "react-cookie";
 import { SESSION_COOKIE_NAME } from "./api/config";
 import { useState } from "react";
-import { requireSession } from "./api/api";
+import { login, requireSession } from "./api/api";
 
 export default function Login() {
   const router = useRouter();
   const [cookies, setCookie] = useCookies([SESSION_COOKIE_NAME]);
   const [username, setUsername] = useState("");
 
-  function login(username: string) {
+  function attemptLogin(username: string) {
     if (username !== "") {
-      setCookie(SESSION_COOKIE_NAME, username);
-      router.push("/");
+      login(username).then((success) => {
+        if (success) {
+          setCookie(SESSION_COOKIE_NAME, username);
+          router.push("/");
+        } else {
+          alert("Username already taken");
+        }
+      });
     }
   }
 
@@ -25,7 +31,7 @@ export default function Login() {
           placeholder="Username"
           onChange={(e) => setUsername(e.target.value)}
         />
-        <button onClick={() => login(username)}>Go</button>
+        <button onClick={() => attemptLogin(username)}>Go</button>
       </div>
     </div>
   );
