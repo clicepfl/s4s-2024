@@ -3,12 +3,12 @@ import { Board, Piece, PieceType, Player } from "../pages/api/models";
 export type MoveWithTaken = {
   x: number;
   y: number;
-  taken: { x: number; y: number }[];
+  taken: { x: number; y: number } | null;
 };
 export type MoveWithTakenAndRaffle = {
   x: number;
   y: number;
-  taken: { x: number; y: number }[];
+  taken: { x: number; y: number } | null;
   raffle: boolean;
 };
 
@@ -34,7 +34,7 @@ function calculateManRegularMoves(board: Board, x: number, y: number) {
 
       // Check if the new cell is empty
       if (newCell == null) {
-        moves.push({ x: newX, y: newY, taken: [] });
+        moves.push({ x: newX, y: newY, taken: null });
       }
     }
   }
@@ -74,7 +74,7 @@ function calculateManTakeMoves(
         takenCell.player !== piece.player &&
         newCell == null
       ) {
-        moves.push({ x: newX, y: newY, taken: [{ x: takenX, y: takenY }] });
+        moves.push({ x: newX, y: newY, taken: { x: takenX, y: takenY } });
       }
     }
   }
@@ -101,7 +101,7 @@ function calculateKingRegularMoves(board: Board, x: number, y: number) {
 
       // Check if the new cell is empty
       if (newCell == null) {
-        moves.push({ x: newX, y: newY, taken: [] });
+        moves.push({ x: newX, y: newY, taken: null });
       } else {
         // Stop moving if there is a piece in the way
         break;
@@ -154,7 +154,7 @@ function calculateKingTakeMoves(
 
           console.log("Adding move", newX, newY, takenX, takenY);
 
-          moves.push({ x: newX, y: newY, taken: [{ x: takenX, y: takenY }] });
+          moves.push({ x: newX, y: newY, taken: { x: takenX, y: takenY } });
 
           newX += dir.x;
           newY += dir.y;
@@ -237,11 +237,17 @@ function calculateMoveSequences(
     for (const moveSequence of moveSequences) {
       const lastMove = moveSequence[moveSequence.length - 1];
 
-      let newBoard = calculateBoardAfterMove(board, moveSequence[0], x, y);
+      // Calculate the board after the move sequence (raffle true so no crowning)
+      let newBoard = calculateBoardAfterMove(
+        board,
+        { ...moveSequence[0], raffle: true },
+        x,
+        y
+      );
       for (let i = 0; i < moveSequence.length - 1; i++) {
         newBoard = calculateBoardAfterMove(
           newBoard,
-          moveSequence[i + 1],
+          { ...moveSequence[i + 1], raffle: true },
           moveSequence[i].x,
           moveSequence[i].y
         );
@@ -308,7 +314,7 @@ function calculateMovablePieces(board: Board, player: Player) {
 
 export function calculateBoardAfterMove(
   board: Board,
-  move: MoveWithTaken,
+  move: MoveWithTakenAndRaffle,
   x: number,
   y: number
 ): Board {
@@ -316,8 +322,15 @@ export function calculateBoardAfterMove(
   newBoard[move.y][move.x] = board[y][x];
   newBoard[y][x] = null;
 
-  for (const taken of move.taken) {
-    newBoard[taken.y][taken.x] = null;
+  if (move.taken != null) {
+    newBoard[move.taken.y][move.taken.x] = null;
+  }
+
+  if (!move.raffle) {
+    // Promote the piece to a king if it reaches the opposite side of the board
+    if (move.y === 0) {
+      newBoard[move.y][move.x].type = PieceType.King;
+    }
   }
 
   return newBoard;
