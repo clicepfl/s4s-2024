@@ -8,14 +8,14 @@ import {
   emptyBoard,
   Player,
   SubmissionLanguage,
-} from "./api/models";
+} from "../api/models";
 import {
   createGame,
   loadSubmission,
   requireSession,
   stopGame,
   submitCode,
-} from "./api/api";
+} from "../api/api";
 import SwapIcon from "@/components/icons/SwapIcon";
 
 const inter = Inter({ subsets: ["latin"] });

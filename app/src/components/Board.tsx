@@ -11,13 +11,13 @@ import {
   initialBoards,
   MoveSequence,
   SingleMove,
-} from "./../pages/api/models";
+} from "../api/models";
 import {
   calculateBoardAfterMove,
   calculatePossibleMoves,
   MoveWithTakenAndRaffle,
 } from "@/util/checkersCalculator";
-import { makeMove } from "@/pages/api/api";
+import { makeMove } from "@/api/api";
 
 type BoardProps = {
   username: string;

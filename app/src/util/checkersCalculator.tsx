@@ -1,4 +1,4 @@
-import { Board, Piece, PieceType, Player } from "../pages/api/models";
+import { Board, Piece, PieceType, Player } from "../api/models";
 
 export type MoveWithTaken = {
   x: number;

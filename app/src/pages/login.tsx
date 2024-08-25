@@ -1,8 +1,8 @@
 import { useRouter } from "next/router";
 import { useCookies } from "react-cookie";
-import { SESSION_COOKIE_NAME } from "./api/config";
+import { SESSION_COOKIE_NAME } from "../api/config";
 import { useState } from "react";
-import { login, requireSession } from "./api/api";
+import { login, requireSession } from "../api/api";
 
 export default function Login() {
   const router = useRouter();
