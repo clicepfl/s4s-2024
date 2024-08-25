@@ -28,6 +28,7 @@ pub fn routes() -> Vec<Route> {
         play::start,
         play::stop,
         play::play,
+        login,
     ]
 }
 
