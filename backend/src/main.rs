@@ -6,6 +6,7 @@ use rocket::{Request, Response};
 use std::sync::Mutex;
 
 pub mod api;
+pub mod config;
 pub mod game;
 
 pub struct CORS;
@@ -39,6 +40,8 @@ impl Fairing for CORS {
 
 #[launch]
 fn rocket() -> _ {
+    config::config();
+
     rocket::build()
         .attach(CORS {})
         .manage(Mutex::<State>::default())

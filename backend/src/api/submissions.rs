@@ -1,3 +1,5 @@
+use crate::config::config;
+
 use super::{AppState, Error, User};
 use async_process::{Child, Command};
 use rocket::{
@@ -106,7 +108,8 @@ pub async fn post_submission(
 ) -> Result<(), Error> {
     let lang = Language::from_str(lang.as_str())?;
 
-    let path = PathBuf::from_str(format!("/data/{}", user.name).as_str()).unwrap();
+    let path = PathBuf::from_str(format!("{}/{}", config().data_dir, user.name).as_str()).unwrap();
+    dbg!(&path);
 
     File::create(path.clone())
         .await
