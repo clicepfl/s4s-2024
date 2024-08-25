@@ -1,0 +1,8 @@
+/target
+.gitignore
+
+.env
+.env.example
+config.json
+
+README.md
