@@ -40,7 +40,8 @@ async function apiCall(
 
   return await fetch(`${API_URL}/${uri}`, {
     method: method || "GET",
-    body: body ? JSON.stringify(body) : undefined,
+    body:
+      typeof body === "string" ? body : body ? JSON.stringify(body) : undefined,
     headers,
   });
 }
@@ -88,7 +89,7 @@ export async function loadSubmission(session: string): Promise<{
   lang: SubmissionLanguage;
   code: string;
 }> {
-  return await (await apiCall("submission", {session, method: "GET" })).json();
+  return await (await apiCall("submission", { session, method: "GET" })).json();
 }
 
 export async function submitCode(
@@ -96,6 +97,7 @@ export async function submitCode(
   code: string,
   session: string
 ): Promise<void> {
+  console.log(code);
   await apiCall(`submission?lang=${language}`, {
     session,
     body: code,
