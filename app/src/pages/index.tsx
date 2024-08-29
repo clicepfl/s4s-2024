@@ -17,25 +17,9 @@ import {
   submitCode,
 } from "../api/api";
 import SwapIcon from "@/components/icons/SwapIcon";
+import { initFiles } from "@/initCodeFiles";
 
 const inter = Inter({ subsets: ["latin"] });
-
-const initFiles: {
-  [lang: string]: { name: string; value: string };
-} = {
-  [SubmissionLanguage.Java]: {
-    name: "Java",
-    value: "// Java",
-  },
-  [SubmissionLanguage.Cpp]: {
-    name: "C++",
-    value: "// C++",
-  },
-  [SubmissionLanguage.Python]: {
-    name: "Python",
-    value: "# Python",
-  },
-};
 
 export default function Home({ username }: { username: string }) {
   const [selectedLang, setLang] = useState(SubmissionLanguage.Java);
