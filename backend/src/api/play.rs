@@ -1,7 +1,5 @@
-use std::sync::Arc;
-
 use super::{AppState, Error, User};
-use crate::game::{GameState, Player};
+use crate::game::{GameState, Move, Player};
 use async_process::{Child, ChildStdin, ChildStdout};
 use rocket::{
     futures::{io::BufReader, AsyncBufReadExt, AsyncWriteExt},
@@ -9,7 +7,7 @@ use rocket::{
     serde::json::Json,
     tokio::sync::Mutex,
 };
-use serde::Deserialize;
+use std::sync::Arc;
 
 #[derive(Debug)]
 pub struct Game {
@@ -103,12 +101,6 @@ pub async fn start(
     );
 
     Ok(Json(checkers))
-}
-
-#[derive(Deserialize, Debug)]
-pub struct Move {
-    pub from: (usize, usize),
-    pub to: (usize, usize),
 }
 
 #[post("/game", format = "json", data = "<moves>")]

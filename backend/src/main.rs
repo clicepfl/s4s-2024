@@ -1,7 +1,7 @@
 use api::State;
 use rocket::fairing::{Fairing, Info, Kind};
 use rocket::http::{ContentType, Header, Method, Status};
-use rocket::{catch, catchers, launch};
+use rocket::launch;
 use rocket::{Request, Response};
 use std::sync::Mutex;
 
