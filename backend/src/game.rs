@@ -83,6 +83,7 @@ fn default_board() -> Board {
 pub struct GameState {
     pub board: Board,
     pub current_player: Player,
+    pub ai_output: String,
 }
 
 impl Default for GameState {
@@ -90,6 +91,7 @@ impl Default for GameState {
         Self {
             board: default_board(),
             current_player: Player::White,
+            ai_output: Default::default(),
         }
     }
 }
@@ -383,7 +385,7 @@ impl GameState {
 
 #[cfg(test)]
 mod test {
-    use super::{Board, GameState, Move, MoveSequence, Piece, Position};
+    use super::{Board, GameState, Move, MoveSequence, Piece};
     use core::hash::Hash;
     use std::collections::HashSet;
 
@@ -414,11 +416,13 @@ mod test {
             GameState {
                 board: board.clone(),
                 current_player: crate::game::Player::White,
+                ..Default::default()
             }
             .list_valid_moves(),
             GameState {
                 board,
                 current_player: crate::game::Player::Black,
+                ..Default::default()
             }
             .list_valid_moves(),
         )
@@ -448,6 +452,7 @@ mod test {
                 [None, None, None, None, None, None, None, None, None, None],
             ],
             current_player: super::Player::White,
+            ..Default::default()
         };
         assert!(state.list_valid_moves().is_empty());
     }

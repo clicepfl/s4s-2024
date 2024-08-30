@@ -95,6 +95,7 @@ Errors are returned as status code. Most notable ones are:
 interface GameState {
   board: Board;
   current_player: Player;
+  ai_output: string; // Everything printed by the AI on stderr since the start/last move.
 }
 
 type Board = (Piece | null)[][];

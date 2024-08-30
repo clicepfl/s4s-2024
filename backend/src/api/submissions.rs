@@ -51,23 +51,28 @@ impl Submission {
     }
 
     pub fn start(&self) -> Result<Child, Error> {
-        match self.lang {
-            Language::Python => Command::new("docker")
-                .args([
-                    "run",
-                    "-v",
-                    format!("{}:/script.py", self.code.to_string_lossy()).as_str(),
-                    "-i",
-                    "python:3-bullseye",
-                    "python",
-                    "/script.py",
-                ])
-                .stdin(Stdio::piped())
-                .stdout(Stdio::piped())
-                .spawn()
-                .map_err(Error::from),
-            _ => todo!(),
-        }
+        let (image, command) = match self.lang {
+            Language::Cpp => ("ghcr.io/clicepfl/s4s-2024-cpp:main", "cp /script /script.cpp && g++ /script.cpp -o /exe && /exe"),
+            Language::Java => ("cimg/openjdk:17.0", "java /script"),
+            Language::Python => ("python:3-bullseye", "python /script"),
+        };
+
+        Command::new("docker")
+            .args([
+                "run",
+                "-v",
+                format!("{}:/script", self.code.to_string_lossy()).as_str(),
+                "-i",
+                image,
+                "sh",
+                "-c",
+                command,
+            ])
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .map_err(Error::from)
     }
 }
 

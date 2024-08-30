@@ -1,6 +1,6 @@
 use super::{AppState, Error, User};
 use crate::game::{GameState, Move, Player};
-use async_process::{Child, ChildStdin, ChildStdout};
+use async_process::{Child, ChildStderr, ChildStdin, ChildStdout};
 use rocket::{
     futures::{io::BufReader, AsyncBufReadExt, AsyncWriteExt},
     get, post,
@@ -14,6 +14,7 @@ pub struct Game {
     handle: Child,
     stdin: ChildStdin,
     stdout: BufReader<ChildStdout>,
+    stderr: BufReader<ChildStderr>,
     checkers: GameState,
     human_player: Player,
 }
@@ -72,24 +73,40 @@ pub async fn start(
     user: User,
     is_first_player: bool,
 ) -> Result<Json<GameState>, Error> {
-    let mut lock = state.lock().unwrap();
+    let game = {
+        let lock = state.lock().unwrap();
+        lock.games.get(&user.name).cloned()
+    };
 
-    if lock.games.contains_key(&user.name) {
-        return Err(Error::GameAlreadyInProgress);
+    if let Some(game) = game {
+        if game.lock().await.handle.try_status()?.is_none() {
+            return Err(Error::GameAlreadyInProgress);
+        }
     }
 
-    let mut child = lock
-        .submissions
-        .get(&user.name)
-        .ok_or(Error::NotFound)?
-        .start()?;
-    let checkers: GameState = Default::default();
+    let mut child = {
+        let lock = state.lock().unwrap();
+        lock.submissions
+            .get(&user.name)
+            .ok_or(Error::NotFound)?
+            .start()?
+    };
+    let mut checkers: GameState = Default::default();
 
+    let mut stderr = BufReader::new(child.stderr.take().unwrap());
+
+    let mut output = vec![];
+    stderr.read_until(1, &mut output).await?;
+
+    checkers.ai_output = String::from_utf8_lossy(&output).to_string();
+
+    let mut lock = state.lock().unwrap();
     lock.games.insert(
         user.name,
         Arc::new(Mutex::new(Game {
             stdin: child.stdin.take().unwrap(),
             stdout: BufReader::new(child.stdout.take().unwrap()),
+            stderr,
             handle: child,
             human_player: if is_first_player {
                 Player::White
