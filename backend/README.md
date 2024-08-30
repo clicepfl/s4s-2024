@@ -22,7 +22,7 @@ Creates a game against the user's submission. Fails if the user already has a ga
 
 #### Response
 
-The initial `GameState`.
+The initial `TurnStatus`.
 
 ---
 
@@ -32,7 +32,7 @@ Get the current state of the game.
 
 ### Response
 
-The current `GameState`.
+The current `TurnStatus`.
 
 ---
 
@@ -48,7 +48,7 @@ type Body = { from: [number, number]; to: [number, number] }[];
 
 ### Response
 
-The `GameState` after the AI has played.
+The `TurnStatus` after the AI has played.
 
 ---
 
@@ -95,6 +95,10 @@ Errors are returned as status code. Most notable ones are:
 interface GameState {
   board: Board;
   current_player: Player;
+}
+
+interface TurnStatus {
+  game: GameState;
   ai_output: string; // Everything printed by the AI on stderr since the start/last move.
 }
 

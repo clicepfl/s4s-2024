@@ -80,10 +80,15 @@ fn default_board() -> Board {
 }
 
 #[derive(Debug, Serialize, Clone)]
+pub struct TurnStatus {
+    pub game: GameState,
+    pub ai_output: String,
+}
+
+#[derive(Debug, Serialize, Clone)]
 pub struct GameState {
     pub board: Board,
     pub current_player: Player,
-    pub ai_output: String,
 }
 
 impl Default for GameState {
@@ -91,7 +96,6 @@ impl Default for GameState {
         Self {
             board: default_board(),
             current_player: Player::White,
-            ai_output: Default::default(),
         }
     }
 }

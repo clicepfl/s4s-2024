@@ -1,5 +1,5 @@
 use super::{AppState, Error, User};
-use crate::game::{GameState, Move, Player};
+use crate::game::{GameState, Move, Player, TurnStatus};
 use async_process::{Child, ChildStderr, ChildStdin, ChildStdout};
 use rocket::{
     futures::{io::BufReader, AsyncBufReadExt, AsyncWriteExt},
@@ -24,7 +24,7 @@ fn convert_cell_id(id: &[char]) -> (usize, usize) {
 }
 
 impl Game {
-    pub async fn play_ai(&mut self) -> Result<(), Error> {
+    pub async fn play_ai(&mut self) -> Result<String, Error> {
         self.stdin
             .write_all(self.checkers.to_csv_string().as_bytes())
             .await
@@ -40,7 +40,9 @@ impl Game {
                 .apply_move(convert_cell_id(&char[0..=1]), convert_cell_id(&char[2..=3]))?;
         }
 
-        Ok(())
+        let mut res = vec![];
+        self.stderr.read_until(1, &mut res);
+        Ok(String::from_utf8_lossy(&res).to_string())
     }
 
     pub async fn play_human(&mut self, moves: Vec<Move>) -> Result<(), Error> {
@@ -72,7 +74,7 @@ pub async fn start(
     state: &AppState,
     user: User,
     is_first_player: bool,
-) -> Result<Json<GameState>, Error> {
+) -> Result<Json<TurnStatus>, Error> {
     let game = {
         let lock = state.lock().unwrap();
         lock.games.get(&user.name).cloned()
@@ -91,14 +93,13 @@ pub async fn start(
             .ok_or(Error::NotFound)?
             .start()?
     };
-    let mut checkers: GameState = Default::default();
+
+    let checkers: GameState = Default::default();
 
     let mut stderr = BufReader::new(child.stderr.take().unwrap());
 
     let mut output = vec![];
     stderr.read_until(1, &mut output).await?;
-
-    checkers.ai_output = String::from_utf8_lossy(&output).to_string();
 
     let mut lock = state.lock().unwrap();
     lock.games.insert(
@@ -117,7 +118,10 @@ pub async fn start(
         })),
     );
 
-    Ok(Json(checkers))
+    Ok(Json(TurnStatus {
+        game: checkers,
+        ai_output: String::from_utf8_lossy(&output).to_string(),
+    }))
 }
 
 #[post("/game", format = "json", data = "<moves>")]
@@ -125,7 +129,7 @@ pub async fn play(
     state: &AppState,
     user: User,
     moves: Json<Vec<Move>>,
-) -> Result<Json<GameState>, Error> {
+) -> Result<Json<TurnStatus>, Error> {
     let game = state.lock().unwrap().games.get(&user.name).map(Arc::clone);
 
     if game.is_none() {
@@ -136,9 +140,12 @@ pub async fn play(
     let mut lock = game.lock().await;
 
     lock.play_human(moves.into_inner()).await?;
-    lock.play_ai().await?;
+    let output = lock.play_ai().await?;
 
-    Ok(Json(lock.checkers.clone()))
+    Ok(Json(TurnStatus {
+        game: lock.checkers.clone(),
+        ai_output: output,
+    }))
 }
 
 #[post("/game/stop")]
