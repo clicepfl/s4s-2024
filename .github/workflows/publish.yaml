@@ -24,7 +24,7 @@ jobs:
   build:
     strategy:
       matrix:
-        directory: [app, backend]
+        directory: [app, backend, cpp]
 
     runs-on: ubuntu-latest
     permissions:
