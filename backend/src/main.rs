@@ -1,5 +1,4 @@
 use api::State;
-use game::GameStatus;
 use rocket::fairing::{Fairing, Info, Kind};
 use rocket::http::{ContentType, Header, Method, Status};
 use rocket::launch;

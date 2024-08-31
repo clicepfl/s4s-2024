@@ -3,9 +3,9 @@ use rocket::{
     post,
     request::{self, FromRequest},
     response::Responder,
-    routes, Request, Response, Route,
+    routes, Request, Route,
 };
-use std::{collections::HashMap, io::Cursor, sync::Arc};
+use std::{collections::HashMap, sync::Arc};
 use submissions::Submission;
 
 pub mod contest;

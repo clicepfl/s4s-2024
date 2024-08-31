@@ -2,7 +2,7 @@ use super::{submissions::Submission, AppState, Error, User};
 use crate::game::{GameState, GameStatus, Move, Player, TurnStatus};
 use rocket::{
     futures::{io::BufReader, AsyncBufReadExt, AsyncReadExt, AsyncWriteExt},
-    get, outcome, post,
+    get, post,
     serde::json::Json,
     tokio::sync::Mutex,
 };
