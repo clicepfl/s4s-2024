@@ -226,14 +226,14 @@ impl GameState {
             .board
             .iter()
             .flatten()
-            .filter(|p| p.is_some_and(|p| p.player == Player::White))
+            .filter(|p| p.as_ref().is_some_and(|p| p.player == Player::White))
             .count();
 
         let blacks = self
             .board
             .iter()
             .flatten()
-            .filter(|p| p.is_some_and(|p| p.player == Player::Black))
+            .filter(|p| p.as_ref().is_some_and(|p| p.player == Player::Black))
             .count();
 
         if whites == 0 {
