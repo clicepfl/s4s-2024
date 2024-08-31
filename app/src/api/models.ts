@@ -3,6 +3,11 @@ export interface GameState {
   current_player: Player;
 }
 
+export interface TurnStatus {
+  game: GameState;
+  ai_output: string; // Everything printed by the AI on stderr since the start/last move.
+}
+
 export type Board = (Piece | null)[][];
 
 export interface Piece {

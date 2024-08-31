@@ -6,6 +6,7 @@ import Board from '@/components/Board';
 import {
   Board as BoardState,
   emptyBoard,
+  initialBoards,
   Player,
   SubmissionLanguage,
 } from '../api/models';
@@ -27,6 +28,7 @@ export default function Home({ username }: { username: string }) {
   const [gameOngoing, setGameOngoing] = useState(false);
   const [player, setPlayer] = useState(Player.White);
   const [currentTurn, setCurrentTurn] = useState<Player | null>(null);
+  const [board, setBoard] = useState(initialBoards[player]);
 
   useEffect(() => {
     getInitialCode(SubmissionLanguage.Java).then((code) => setFile(code));
@@ -87,6 +89,8 @@ export default function Home({ username }: { username: string }) {
                         alert(game.message);
                       } else {
                         setGameOngoing(true);
+                        setBoard(game.board);
+                        setCurrentTurn(game.current_player);
                       }
                     },
                     (err) => alert(err.message)
@@ -156,11 +160,14 @@ export default function Home({ username }: { username: string }) {
                   gameOngoing={gameOngoing}
                   currentTurn={currentTurn}
                   setCurrentTurn={setCurrentTurn}
+                  board={board}
+                  setBoard={setBoard}
                 />
               </div>
               <div className="game-info">
                 <p>Game State: {gameOngoing ? 'Ongoing' : 'Stopped'}</p>
                 <p>Current Turn: {currentTurn ?? 'None'}</p>
+                <p>Player: {player}</p>
               </div>
             </div>
           </div>

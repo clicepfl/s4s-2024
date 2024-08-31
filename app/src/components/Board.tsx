@@ -25,6 +25,8 @@ type BoardProps = {
   gameOngoing: boolean;
   currentTurn: Player | null;
   setCurrentTurn: (player: Player) => void;
+  board: BoardState;
+  setBoard: (board: BoardState) => void;
 };
 
 export default function Board({
@@ -33,8 +35,10 @@ export default function Board({
   gameOngoing,
   currentTurn,
   setCurrentTurn,
+  board, 
+  setBoard,
 }: BoardProps) {
-  const [board, setBoard] = useState(initialBoards[player]);
+  
   const [currentMoveSequence, setCurrentMoveSequence] = useState<MoveSequence>(
     []
   );
@@ -98,13 +102,13 @@ export default function Board({
               player == Player.White ? Player.Black : Player.White
             ); // switch turn
             makeMove(currentMoveSequence, username).then(
-              (game) => {
-                if (game instanceof Error) {
-                  alert(game.message);
+              (turnStatus) => {
+                if (turnStatus instanceof Error) {
+                  alert(turnStatus.message);
                 } else {
                   // TODO: add buffer time before updating board ?
-                  setBoard(game.board); // update board with server response
-                  setCurrentTurn(game.current_player);
+                  setBoard(turnStatus.game.board); // update board with server response
+                  setCurrentTurn(turnStatus.game.current_player);
                 }
               },
               (error) => {
