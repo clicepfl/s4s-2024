@@ -195,11 +195,58 @@ impl GameState {
     }
 
     pub fn apply_sequence(&mut self, seq: &[Move]) -> Result<(), Error> {
-        let from = seq.first().unwrap().from;
-        let to = seq.last().unwrap().to;
+        let available_moves = self.list_valid_moves();
 
-        self.board[to.0][to.1] = self.board[from.0][from.1].take();
-        Ok(())
+        let move_ = available_moves.into_iter().find(|m| m.0 == seq);
+
+        if let Some((moves, captures)) = move_ {
+            let from = moves.first().unwrap().from;
+            let to = moves.last().unwrap().to;
+
+            self.board[to.0][to.1] = self.board[from.0][from.1].take();
+
+            for captured in captures {
+                self.board[captured.0][captured.1] = None;
+            }
+
+            self.status = self.compute_status();
+            self.current_player = match self.current_player {
+                Player::White => Player::Black,
+                Player::Black => Player::White,
+            };
+
+            Ok(())
+        } else {
+            Err(Error::InvalidMove)
+        }
+    }
+
+    fn compute_status(&self) -> GameStatus {
+        let whites = self
+            .board
+            .iter()
+            .flatten()
+            .filter(|p| p.is_some_and(|p| p.player == Player::White))
+            .count();
+
+        let blacks = self
+            .board
+            .iter()
+            .flatten()
+            .filter(|p| p.is_some_and(|p| p.player == Player::Black))
+            .count();
+
+        if whites == 0 {
+            if blacks == 0 {
+                GameStatus::Draw
+            } else {
+                GameStatus::Victory(Player::Black)
+            }
+        } else if blacks == 0 {
+            GameStatus::Victory(Player::White)
+        } else {
+            GameStatus::Running
+        }
     }
 
     pub fn list_valid_moves(&self) -> Vec<MoveSequence> {
