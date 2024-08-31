@@ -83,7 +83,7 @@ export default function Home({ username }: { username: string }) {
                   stopGame(username);
                   setGameOngoing(false);
                 } else {
-                  createGame(username, player == Player.Black).then(
+                  createGame(username, player == Player.White).then(
                     (game) => {
                       if (game instanceof Error) {
                         alert(game.message);
