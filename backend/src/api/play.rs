@@ -82,23 +82,35 @@ pub async fn start(
     state: &AppState,
     user: User,
     is_first_player: bool,
-) -> Result<Json<GameState>, Error> {
+) -> Result<Json<TurnStatus>, Error> {
     let checkers: GameState = Default::default();
 
-    let mut lock = state.lock().unwrap();
-    lock.games.insert(
-        user.name,
-        Arc::new(Mutex::new(Game {
-            human_player: if is_first_player {
-                Player::White
-            } else {
-                Player::Black
-            },
-            checkers: checkers.clone(),
-        })),
-    );
+    let mut game = Game {
+        human_player: if is_first_player {
+            Player::White
+        } else {
+            Player::Black
+        },
+        checkers: checkers.clone(),
+    };
 
-    Ok(Json(checkers))
+    let mut ai_output = String::new();
+    if !is_first_player {
+        let submission = state
+            .lock()
+            .unwrap()
+            .submissions
+            .get(&user.name)
+            .ok_or(Error::NotFound)?
+            .clone();
+
+        ai_output = game.play_ai(submission).await?;
+    }
+
+    let mut lock = state.lock().unwrap();
+    lock.games.insert(user.name, Arc::new(Mutex::new(game)));
+
+    Ok(Json(TurnStatus { game, ai_output }))
 }
 
 #[post("/game", format = "json", data = "<moves>")]

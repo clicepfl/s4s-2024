@@ -22,7 +22,7 @@ Creates a game against the user's submission. Fails if the user already has a ga
 
 #### Response
 
-The initial `GameState`.
+The initial `TurnStatus`.
 
 ---
 
