@@ -482,13 +482,13 @@ mod test {
             GameState {
                 board: board.clone(),
                 current_player: crate::game::Player::White,
-                ..Default::default()
+                status: super::GameStatus::Running,
             }
             .list_valid_moves(),
             GameState {
                 board,
                 current_player: crate::game::Player::Black,
-                ..Default::default()
+                status: super::GameStatus::Running,
             }
             .list_valid_moves(),
         )
