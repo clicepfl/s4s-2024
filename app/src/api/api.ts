@@ -57,7 +57,7 @@ export async function login(username: string): Promise<boolean> {
 export async function createGame(
   session: string,
   isFirstPlayer: boolean
-): Promise<GameState | Error> {
+): Promise<TurnStatus | Error> {
   return await (
     await apiCall(`game/start?is_first_player=${isFirstPlayer}`, {
       session,

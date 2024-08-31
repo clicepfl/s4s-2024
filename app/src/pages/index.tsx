@@ -84,13 +84,13 @@ export default function Home({ username }: { username: string }) {
                   setGameOngoing(false);
                 } else {
                   createGame(username, player == Player.White).then(
-                    (game) => {
-                      if (game instanceof Error) {
-                        alert(game.message);
+                    (turnStatus) => {
+                      if (turnStatus instanceof Error) {
+                        alert(turnStatus.message);
                       } else {
                         setGameOngoing(true);
-                        setBoard(game.board);
-                        setCurrentTurn(game.current_player);
+                        setBoard(turnStatus.game.board);
+                        setCurrentTurn(turnStatus.game.current_player);
                       }
                     },
                     (err) => alert(err.message)
