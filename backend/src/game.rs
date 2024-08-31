@@ -71,7 +71,9 @@ fn default_board() -> Board {
     fill_row(&mut board, 0, Player::Black);
     fill_row(&mut board, 1, Player::Black);
     fill_row(&mut board, 2, Player::Black);
+    fill_row(&mut board, 3, Player::Black);
 
+    fill_row(&mut board, BOARD_SIZE - 4, Player::White);
     fill_row(&mut board, BOARD_SIZE - 3, Player::White);
     fill_row(&mut board, BOARD_SIZE - 2, Player::White);
     fill_row(&mut board, BOARD_SIZE - 1, Player::White);
