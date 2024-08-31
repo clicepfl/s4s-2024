@@ -170,7 +170,9 @@ export default function Home({ username }: { username: string }) {
               loading="Loading Editor..."
               language={selectedLang}
               value={file}
-              onChange={(code: string) => (code ? setFile(code) : null)}
+              onChange={(code: string | undefined) =>
+                code ? setFile(code) : null
+              }
             />
           </div>
         </div>
