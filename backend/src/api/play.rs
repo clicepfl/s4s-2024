@@ -107,10 +107,15 @@ pub async fn start(
         ai_output = game.play_ai(submission).await?;
     }
 
+    let checkers = game.checkers.clone();
+
     let mut lock = state.lock().unwrap();
     lock.games.insert(user.name, Arc::new(Mutex::new(game)));
 
-    Ok(Json(TurnStatus { game, ai_output }))
+    Ok(Json(TurnStatus {
+        game: checkers,
+        ai_output,
+    }))
 }
 
 #[post("/game", format = "json", data = "<moves>")]
