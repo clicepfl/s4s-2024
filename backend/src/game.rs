@@ -57,7 +57,7 @@ pub type Board = [[Option<Piece>; BOARD_SIZE]; BOARD_SIZE];
 fn default_board() -> Board {
     fn fill_row(board: &mut Board, row: usize, player: Player) {
         for i in 0..BOARD_SIZE {
-            if (i + row) % 2 == 0 {
+            if (i + row) % 2 == 1 {
                 board[row][i] = Some(Piece {
                     type_: PieceType::Man,
                     player,
