@@ -1,12 +1,16 @@
 use super::{submissions::Submission, AppState, Error, User};
 use crate::game::{GameState, GameStatus, Move, Player, TurnStatus};
+use regex::Regex;
 use rocket::{
     futures::{io::BufReader, AsyncBufReadExt, AsyncReadExt, AsyncWriteExt},
     get, post,
     serde::json::Json,
     tokio::sync::Mutex,
 };
-use std::sync::Arc;
+use std::sync::{Arc, LazyLock};
+
+static AI_OUTPUT_REGEX: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new("^([A-J]\\d,[A-J]\\d;)+$").unwrap());
 
 #[derive(Debug)]
 pub struct Game {
@@ -39,18 +43,22 @@ impl Game {
         let mut ai_output = String::new();
         stderr.read_to_string(&mut ai_output).await?;
 
-        let seq = line
-            .split(";")
-            .map(|m| {
-                let chars = m.chars().collect::<Vec<_>>();
-                Move {
-                    from: convert_cell_id(&chars[0..=1]),
-                    to: convert_cell_id(&chars[2..=3]),
-                }
-            })
-            .collect::<Vec<_>>();
+        if AI_OUTPUT_REGEX.is_match(&line) {
+            let seq = line
+                .split(";")
+                .map(|m| {
+                    let chars = m.chars().collect::<Vec<_>>();
+                    Move {
+                        from: convert_cell_id(&chars[0..=1]),
+                        to: convert_cell_id(&chars[2..=3]),
+                    }
+                })
+                .collect::<Vec<_>>();
 
-        if let Err(Error::InvalidMove) = self.checkers.apply_sequence(&seq) {
+            if let Err(Error::InvalidMove) = self.checkers.apply_sequence(&seq) {
+                self.checkers.status = GameStatus::Victory(self.human_player)
+            }
+        } else {
             self.checkers.status = GameStatus::Victory(self.human_player)
         }
 
