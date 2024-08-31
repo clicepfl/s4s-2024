@@ -42,17 +42,24 @@ pub struct Submission {
 }
 
 impl Submission {
-    pub fn empty(name: String) -> Self {
-        Self {
+    pub fn empty(name: String) -> Result<Self, Error> {
+        let path = PathBuf::from_str(format!("{}/{}", config().data_dir, name).as_str()).unwrap();
+
+        std::fs::File::create(path.clone())?;
+
+        Ok(Self {
             name,
             lang: Language::Cpp,
-            code: Default::default(),
-        }
+            code: path,
+        })
     }
 
     pub fn start(&self) -> Result<Child, Error> {
         let (image, command) = match self.lang {
-            Language::Cpp => ("ghcr.io/clicepfl/s4s-2024-cpp:main", "cp /script /script.cpp && g++ /script.cpp -o /exe && /exe"),
+            Language::Cpp => (
+                "ghcr.io/clicepfl/s4s-2024-cpp:main",
+                "cp /script /script.cpp && g++ /script.cpp -o /exe && /exe",
+            ),
             Language::Java => ("cimg/openjdk:17.0", "java /script"),
             Language::Python => ("python:3-bullseye", "python /script"),
         };

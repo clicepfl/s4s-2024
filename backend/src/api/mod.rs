@@ -38,10 +38,11 @@ pub async fn login(name: &str, state: &AppState) -> rocket::http::Status {
 
     if lock.submissions.contains_key(name) {
         rocket::http::Status::Conflict
-    } else {
-        lock.submissions
-            .insert(name.to_string(), Submission::empty(name.to_string()));
+    } else if let Ok(submission) = Submission::empty(name.to_string()) {
+        lock.submissions.insert(name.to_string(), submission);
         rocket::http::Status::Ok
+    } else {
+        rocket::http::Status::InternalServerError
     }
 }
 
