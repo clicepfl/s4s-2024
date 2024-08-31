@@ -86,9 +86,18 @@ pub struct TurnStatus {
 }
 
 #[derive(Debug, Serialize, Clone)]
+#[serde(tag = "status", content = "player", rename_all = "camelCase")]
+pub enum GameStatus {
+    Running,
+    Draw,
+    Victory(Player),
+}
+
+#[derive(Debug, Serialize, Clone)]
 pub struct GameState {
     pub board: Board,
     pub current_player: Player,
+    pub status: GameStatus,
 }
 
 impl Default for GameState {
@@ -96,6 +105,7 @@ impl Default for GameState {
         Self {
             board: default_board(),
             current_player: Player::White,
+            status: GameStatus::Running,
         }
     }
 }
@@ -184,7 +194,10 @@ impl GameState {
             .join("\n")
     }
 
-    pub fn apply_move(&mut self, from: (usize, usize), to: (usize, usize)) -> Result<(), Error> {
+    pub fn apply_sequence(&mut self, seq: &[Move]) -> Result<(), Error> {
+        let from = seq.first().unwrap().from;
+        let to = seq.last().unwrap().to;
+
         self.board[to.0][to.1] = self.board[from.0][from.1].take();
         Ok(())
     }

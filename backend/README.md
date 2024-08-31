@@ -22,7 +22,7 @@ Creates a game against the user's submission. Fails if the user already has a ga
 
 #### Response
 
-The initial `TurnStatus`.
+The initial `GameState`.
 
 ---
 
@@ -95,7 +95,14 @@ Errors are returned as status code. Most notable ones are:
 interface GameState {
   board: Board;
   current_player: Player;
+  status: GameStatus;
 }
+
+type GameStatus =
+  | {
+      status: 'draw' | 'running';
+    }
+  | { status: 'victory'; player: Player };
 
 interface TurnStatus {
   game: GameState;
