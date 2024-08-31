@@ -1,47 +1,54 @@
-import Head from "next/head";
-import { Inter } from "next/font/google";
-import Editor from "@monaco-editor/react";
-import { useState } from "react";
-import Board from "@/components/Board";
+import Head from 'next/head';
+import { Inter } from 'next/font/google';
+import Editor from '@monaco-editor/react';
+import { useEffect, useState } from 'react';
+import Board from '@/components/Board';
 import {
   Board as BoardState,
   emptyBoard,
   Player,
   SubmissionLanguage,
-} from "../api/models";
+} from '../api/models';
 import {
   createGame,
   loadSubmission,
   requireSession,
   stopGame,
   submitCode,
-} from "../api/api";
-import SwapIcon from "@/components/icons/SwapIcon";
-import { initFiles } from "@/initCodeFiles";
+} from '../api/api';
+import SwapIcon from '@/components/icons/SwapIcon';
+import { getInitialCode, initFiles } from '@/util/initCodeFiles';
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 
 export default function Home({ username }: { username: string }) {
   const [selectedLang, setLang] = useState(SubmissionLanguage.Java);
-  const [file, setFile] = useState(initFiles[selectedLang].value);
+  const [file, setFile] = useState('');
   const [gameOngoing, setGameOngoing] = useState(false);
   const [player, setPlayer] = useState(Player.White);
   const [currentTurn, setCurrentTurn] = useState<Player | null>(null);
 
-  function changeLang(lang: SubmissionLanguage) {
-    if (initFiles[selectedLang].value === file) {
+  useEffect(() => {
+    getInitialCode(SubmissionLanguage.Java).then((code) => setFile(code));
+  }, []);
+
+  async function changeLang(lang: SubmissionLanguage) {
+    const currentInitialCode = await getInitialCode(selectedLang);
+    const wantedInitialCode = await getInitialCode(lang);
+
+    if (currentInitialCode === file) {
       // If the current file is the default one, we can safely change the language
       setLang(lang);
-      setFile(initFiles[lang].value);
+      setFile(wantedInitialCode);
     } else {
       // Otherwise, we ask for confirmation
       if (
         confirm(
-          "Are you sure ? Changing the language will overwrite your current code."
+          'Are you sure ? Changing the language will overwrite your current code.'
         )
       ) {
         setLang(lang);
-        setFile(initFiles[lang].value);
+        setFile(wantedInitialCode);
       }
     }
   }
@@ -87,13 +94,13 @@ export default function Home({ username }: { username: string }) {
                 }
               }}
             >
-              {gameOngoing ? "Stop Game" : "Start Game"}
+              {gameOngoing ? 'Stop Game' : 'Start Game'}
             </button>
             <button
               className="button"
               onClick={() =>
                 submitCode(selectedLang, file, username).then(
-                  () => alert("Code submitted !"),
+                  () => alert('Code submitted !'),
                   (err) => alert(err.message)
                 )
               }
@@ -106,7 +113,7 @@ export default function Home({ username }: { username: string }) {
               onClick={() => {
                 if (
                   confirm(
-                    "Are you sure ? Loading your last submission will overwrite your current code."
+                    'Are you sure ? Loading your last submission will overwrite your current code.'
                   )
                 ) {
                   loadSubmission(username).then(
@@ -152,8 +159,8 @@ export default function Home({ username }: { username: string }) {
                 />
               </div>
               <div className="game-info">
-                <p>Game State: {gameOngoing ? "Ongoing" : "Stopped"}</p>
-                <p>Current Turn: {currentTurn ?? "None"}</p>
+                <p>Game State: {gameOngoing ? 'Ongoing' : 'Stopped'}</p>
+                <p>Current Turn: {currentTurn ?? 'None'}</p>
               </div>
             </div>
           </div>
@@ -163,7 +170,7 @@ export default function Home({ username }: { username: string }) {
               loading="Loading Editor..."
               language={selectedLang}
               value={file}
-              onChange={(code) => (code ? setFile(code) : null)}
+              onChange={(code: string) => (code ? setFile(code) : null)}
             />
           </div>
         </div>
