@@ -5,6 +5,15 @@ public class CheckersBoardParser {
 
     private record Piece(char pieceType, char pieceColor) {}
 
+    // This method parses the board and returns each cell's content as an array of moves
+    private static int[][] findMove(Piece[][] board, char playerColor) {
+        // TODO: Implement logic to find the next move
+        // The moves should be returned as an array of 2-element arrays
+        // The first element of the sequence should be the starting cell
+        // Each subsequent 2-element array should contain the x and y coordinates of the cell to move to
+        return null;
+    }
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Piece[][] board = new Piece[10][10]; // Initialize a 10x10 board
@@ -44,14 +53,5 @@ public class CheckersBoardParser {
             System.out.println(pos[0] + "," + pos[1]);
         }
 
-    }
-
-    // This method parses the board and returns each cell's content as an array of moves
-    private static int[][] findMove(Piece[][] board, char playerColor) {
-        // TODO: Implement logic to find the next move
-        // The moves should be returned as an array of 2-element arrays
-        // The first element of the sequence should be the starting cell
-        // Each subsequent 2-element array should contain the x and y coordinates of the cell to move to
-        return null;
     }
 }
