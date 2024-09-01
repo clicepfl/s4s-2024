@@ -87,7 +87,7 @@ The code as plain text.
 Errors are returned as status code. Most notable ones are:
 
 - `401 Unauthorized`: Missing session cookie.
-- `406 Not acceptable`: The AI has failed to provide a valid move.
+- `406 Not acceptable`: The AI has failed to provide a valid move. The response will contain a JSON with the `AIError` format.
 
 ## Models
 
@@ -124,5 +124,16 @@ enum Player {
 enum PieceType {
   Man = 'man',
   King = 'king',
+}
+
+enum AIErrorType {
+  NoSubmission = 'noSubmission',
+  InvalidMove = 'invalidMove',
+  InvalidOutput = 'invalidOutput',
+}
+
+interface AIError {
+  error: AIErrorType,
+  ai_output: string
 }
 ```

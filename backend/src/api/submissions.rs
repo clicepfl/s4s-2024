@@ -55,6 +55,14 @@ impl Submission {
     }
 
     pub fn start(&self) -> Result<Child, Error> {
+        let metadata = std::fs::metadata(self.code.clone());
+        if metadata.is_err() || metadata.is_ok_and(|m| m.len() == 0) {
+            return Err(Error::AIFailed {
+                error: super::AIError::EmptySubmission,
+                ai_output: "".to_owned(),
+            });
+        }
+
         let (image, command) = match self.lang {
             Language::Cpp => (
                 "ghcr.io/clicepfl/s4s-2024-cpp:main",

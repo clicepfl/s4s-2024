@@ -43,23 +43,30 @@ impl Game {
         let mut ai_output = String::new();
         stderr.read_to_string(&mut ai_output).await?;
 
-        if AI_OUTPUT_REGEX.is_match(&line) {
-            let seq = line
-                .split(";")
-                .map(|m| {
-                    let chars = m.chars().collect::<Vec<_>>();
-                    Move {
-                        from: convert_cell_id(&chars[0..=1]),
-                        to: convert_cell_id(&chars[2..=3]),
-                    }
-                })
-                .collect::<Vec<_>>();
+        if !AI_OUTPUT_REGEX.is_match(&line) {
+            return Err(Error::AIFailed {
+                error: super::AIError::InvalidOutput,
+                ai_output,
+            });
+        }
 
-            if let Err(Error::InvalidMove) = self.checkers.apply_sequence(&seq) {
-                self.checkers.status = GameStatus::Victory(self.human_player)
-            }
-        } else {
-            self.checkers.status = GameStatus::Victory(self.human_player)
+        let seq = line
+            .split(";")
+            .map(|m| {
+                let chars = m.chars().collect::<Vec<_>>();
+                Move {
+                    from: convert_cell_id(&chars[0..=1]),
+                    to: convert_cell_id(&chars[2..=3]),
+                }
+            })
+            .collect::<Vec<_>>();
+
+        if let Err(Error::InvalidMove) = self.checkers.apply_sequence(&seq) {
+            self.checkers.status = GameStatus::Victory(self.human_player);
+            return Err(Error::AIFailed {
+                error: super::AIError::InvalidMove,
+                ai_output,
+            });
         }
 
         Ok(ai_output)

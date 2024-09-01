@@ -1,11 +1,13 @@
 use play::Game;
 use rocket::{
+    http::Header,
     post,
     request::{self, FromRequest},
     response::Responder,
-    routes, Request, Route,
+    routes, Request, Response, Route,
 };
-use std::{collections::HashMap, sync::Arc};
+use serde::Serialize;
+use std::{collections::HashMap, io::Cursor, sync::Arc};
 use submissions::Submission;
 
 pub mod contest;
@@ -46,14 +48,23 @@ pub async fn login(name: &str, state: &AppState) -> rocket::http::Status {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum AIError {
+    InvalidMove,
+    InvalidOutput,
+    EmptySubmission,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(untagged)]
 pub enum Error {
     IO,
     Poison,
     InvalidLanguage,
     NotFound,
     InvalidMove,
-    AIFailed,
+    AIFailed { error: AIError, ai_output: String },
     Unauthorized,
     GameAlreadyInProgress,
 }
@@ -68,7 +79,13 @@ impl<'r, 'o: 'r> Responder<'r, 'o> for Error {
             Error::InvalidMove | Error::GameAlreadyInProgress | Error::InvalidLanguage => {
                 Status::BadRequest
             }
-            Error::AIFailed => Status::NotAcceptable,
+            e @ Error::AIFailed { .. } => {
+                return Ok(Response::build()
+                    .status(Status::NotAcceptable)
+                    .header(Header::new("Content-Type", "application/json"))
+                    .streamed_body(Cursor::new(serde_json::to_string(&e).unwrap()))
+                    .finalize())
+            }
             Error::Unauthorized => Status::Unauthorized,
         })
     }
