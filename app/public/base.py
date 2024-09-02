@@ -39,7 +39,7 @@ def main():
 
     # Print the moves
     for pos in moves:
-        print(f"{pos[0][0]}{pos[0][1]},{pos[1][0]}{pos[1][1]}")
+        print(f"{pos[0][0]}{pos[0][1]},{pos[1][0]}{pos[1][1]};")
 
 if __name__ == "__main__":
     main()

@@ -68,13 +68,18 @@ impl Submission {
                 "ghcr.io/clicepfl/s4s-2024-cpp:main",
                 "cp /script /script.cpp && g++ /script.cpp -o /exe && /exe",
             ),
-            Language::Java => ("cimg/openjdk:17.0", "java /script"),
+            Language::Java => (
+                "cimg/openjdk:17.0",
+                "cp /script /script.java && java /script.java",
+            ),
             Language::Python => ("python:3-bullseye", "python /script"),
         };
 
         Command::new("docker")
             .args([
                 "run",
+                "-u",
+                "root",
                 "-v",
                 format!("{}:/script", self.code.to_string_lossy()).as_str(),
                 "-i",

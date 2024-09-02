@@ -180,7 +180,8 @@ fn mov(from: Pos, to: Pos) -> Move {
 
 impl GameState {
     pub fn to_csv_string(&self) -> String {
-        self.board
+        dbg!(self
+            .board
             .iter()
             .map(|row| {
                 row.iter()
@@ -190,10 +191,11 @@ impl GameState {
                             .map_or_else(|| "".to_owned(), Piece::to_string)
                     })
                     .collect::<Vec<_>>()
-                    .join(";")
+                    .join(",")
             })
             .collect::<Vec<_>>()
-            .join("\n")
+            .join("\n"))
+            + "\n"
     }
 
     pub fn apply_sequence(&mut self, seq: &[Move]) -> Result<(), Error> {
@@ -289,7 +291,7 @@ impl GameState {
                         .is_some_and(|p| p.player != state.current_player)
             };
 
-            if i.captures.is_empty() {
+            let mut moves: Vec<Intermediate> = if i.captures.is_empty() {
                 let dv = match state.current_player {
                     Player::White => -1,
                     Player::Black => 1,
@@ -307,14 +309,14 @@ impl GameState {
                                 moves: vec![mov(i.pos, i.pos + d)],
                             }]
                         } else if is_valid_capture_move(d * 2) {
-                            list_valid_moves_for_man(
+                            dbg!(list_valid_moves_for_man(
                                 state,
                                 Intermediate {
                                     pos: i.pos + d * 2,
                                     captures: vec![i.pos + d],
                                     moves: vec![mov(i.pos, i.pos + d * 2)],
                                 },
-                            )
+                            ))
                         } else {
                             vec![]
                         }
@@ -332,14 +334,21 @@ impl GameState {
                     })
                     .flat_map(|i| list_valid_moves_for_man(state, i))
                     .collect()
+            };
+
+            if !i.moves.is_empty() {
+                moves.push(i);
             }
+
+            moves
         }
 
         fn list_valid_moves_for_king(state: &GameState, i: Intermediate) -> Vec<Intermediate> {
             let d = vec![p(1, 1), p(1, -1), p(-1, 1), p(-1, -1)];
             let must_capture = !i.captures.is_empty();
 
-            d.into_iter()
+            let mut moves: Vec<Intermediate> = d
+                .into_iter()
                 .flat_map(|delta| {
                     let next = (1..BOARD_SIZE).fold(
                         (None, vec![], false),
@@ -381,7 +390,13 @@ impl GameState {
                         vec![]
                     }
                 })
-                .collect::<Vec<_>>()
+                .collect::<Vec<_>>();
+
+            if !i.moves.is_empty() {
+                moves.push(i);
+            }
+
+            moves
         }
 
         let mut available_moves = vec![];
@@ -425,7 +440,7 @@ impl GameState {
                                 i.moves,
                                 i.captures
                                     .into_iter()
-                                    .map(|c| (c.y as usize, c.x as usize))
+                                    .map(|c| (c.x as usize, c.y as usize))
                                     .collect::<Vec<_>>(),
                             )
                         })
@@ -556,6 +571,58 @@ mod test {
         ));
 
         assert!(black_moves.is_empty());
+    }
+
+    #[test]
+    fn single_capture_man() {
+        let board = [
+            [None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None],
+            [
+                None,
+                p('M', 'B'),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                None,
+                None,
+                p('M', 'W'),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None],
+        ];
+
+        let (white_moves, black_moves) = dbg!(list(board));
+
+        assert_eq!(white_moves.len(), 1);
+        assert!(iters_equal_anyorder(
+            white_moves.iter(),
+            [(vec![m(5, 2, 3, 0)], vec![(4, 1)])].iter()
+        ));
+
+        assert_eq!(black_moves.len(), 1);
+        assert!(iters_equal_anyorder(
+            black_moves.iter(),
+            [(vec![m(4, 1, 6, 3)], vec![(5, 2)])].iter()
+        ));
     }
 
     #[test]

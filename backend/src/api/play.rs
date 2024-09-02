@@ -31,6 +31,11 @@ impl Game {
         let mut stderr = BufReader::new(child.stderr.take().unwrap());
 
         stdin
+            .write_all(format!("{}\n", self.checkers.current_player).as_bytes())
+            .await
+            .map_err(Error::from)?;
+
+        stdin
             .write_all(self.checkers.to_csv_string().as_bytes())
             .await
             .map_err(Error::from)?;

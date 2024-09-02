@@ -1,4 +1,4 @@
-
+import java.util.List;
 import java.util.Scanner;
 
 public class CheckersBoardParser {
@@ -13,7 +13,7 @@ public class CheckersBoardParser {
         // The moves should be returned as an array of 2-element arrays
         // The first element of the sequence should be the starting cell
         // Each subsequent 2-element array should contain the x and y coordinates of the cell to move to
-        return null;
+        return List.of(new Move(new Position(6,1), new Position(5,0)));
     }
 
     public static void main(String[] args) {
@@ -54,7 +54,7 @@ public class CheckersBoardParser {
         for (Move move : moves) {
             System.out.println(
                 move.from.row + "" + move.from.column + "," 
-                + move.to.row + "" + move.to.column
+                + move.to.row + "" + move.to.column + ";"
             );
         }
 
