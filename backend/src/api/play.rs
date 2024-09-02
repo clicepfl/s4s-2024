@@ -39,11 +39,12 @@ impl Game {
 
         let mut line = String::new();
         stdout.read_line(&mut line).await?;
+        let line = line.trim();
 
         let mut ai_output = String::new();
         stderr.read_to_string(&mut ai_output).await?;
 
-        if !AI_OUTPUT_REGEX.is_match(&line) {
+        if !AI_OUTPUT_REGEX.is_match(line) {
             return Err(Error::AIFailed {
                 error: super::AIError::InvalidOutput,
                 ai_output,
