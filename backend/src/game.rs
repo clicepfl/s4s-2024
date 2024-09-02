@@ -207,6 +207,15 @@ impl GameState {
             let to = moves.last().unwrap().to;
 
             self.board[to.0][to.1] = self.board[from.0][from.1].take();
+            if to.0
+                == match self.current_player {
+                    Player::White => 0,
+                    Player::Black => BOARD_SIZE - 1,
+                }
+            {
+                self.board[to.0][to.1].as_mut().unwrap().type_ = PieceType::King;
+                // TODO Test
+            }
 
             for captured in captures {
                 self.board[captured.0][captured.1] = None;
@@ -749,18 +758,7 @@ mod test {
         let board = [
             [None, None, None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None],
-            [
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ],
+            [None, None, None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None],
             [
                 None,
@@ -781,7 +779,7 @@ mod test {
                 None,
                 None,
                 None,
-                None,//
+                None, //
                 None,
                 None,
                 None,
