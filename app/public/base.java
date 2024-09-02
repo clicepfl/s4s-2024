@@ -4,9 +4,11 @@ import java.util.Scanner;
 public class CheckersBoardParser {
 
     private record Piece(char pieceType, char pieceColor) {}
+    private record Position(int row, int column) {}
+    private record Move(Position from, Position to) {}
 
     // This method parses the board and returns each cell's content as an array of moves
-    private static int[][] findMove(Piece[][] board, char playerColor) {
+    private static List<Move> findMove(Piece[][] board, char playerColor) {
         // TODO: Implement logic to find the next move
         // The moves should be returned as an array of 2-element arrays
         // The first element of the sequence should be the starting cell
@@ -41,7 +43,7 @@ public class CheckersBoardParser {
         scanner.close();
 
         // Call the findMove method to find the next move
-        int[][] moves = findMove(board, playerColor);
+        List<Move> moves = findMove(board, playerColor);
 
         if (moves == null) {
             // Error occured
@@ -49,8 +51,11 @@ public class CheckersBoardParser {
         }
 
         // Print the moves
-        for (int[] pos : moves) {
-            System.out.println(pos[0] + "," + pos[1]);
+        for (Move move : moves) {
+            System.out.println(
+                move.from.row + "" + move.from.column + "," 
+                + move.to.row + "" + move.to.column
+            );
         }
 
     }
