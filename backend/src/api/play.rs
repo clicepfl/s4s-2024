@@ -19,7 +19,8 @@ pub struct Game {
 }
 
 fn convert_cell_id(id: &[char]) -> (usize, usize) {
-    (id[0] as usize - 'A' as usize, id[0] as usize - '0' as usize)
+    dbg!(id);
+    (id[0] as usize - 'A' as usize, id[1] as usize - '0' as usize)
 }
 
 impl Game {
@@ -53,11 +54,12 @@ impl Game {
 
         let seq = line
             .split(";")
+            .filter(|m| !m.is_empty())
             .map(|m| {
                 let chars = m.chars().collect::<Vec<_>>();
                 Move {
                     from: convert_cell_id(&chars[0..=1]),
-                    to: convert_cell_id(&chars[2..=3]),
+                    to: convert_cell_id(&chars[3..=4]),
                 }
             })
             .collect::<Vec<_>>();
