@@ -180,8 +180,7 @@ fn mov(from: Pos, to: Pos) -> Move {
 
 impl GameState {
     pub fn to_csv_string(&self) -> String {
-        dbg!(self
-            .board
+        self.board
             .iter()
             .map(|row| {
                 row.iter()
@@ -194,7 +193,7 @@ impl GameState {
                     .join(",")
             })
             .collect::<Vec<_>>()
-            .join("\n"))
+            .join("\n")
             + "\n"
     }
 
@@ -309,24 +308,24 @@ impl GameState {
                                 moves: vec![mov(i.pos, i.pos + d)],
                             }]
                         } else if is_valid_capture_move(d * 2) {
-                            dbg!(list_valid_moves_for_man(
+                            list_valid_moves_for_man(
                                 state,
                                 Intermediate {
                                     pos: i.pos + d * 2,
                                     captures: vec![i.pos + d],
                                     moves: vec![mov(i.pos, i.pos + d * 2)],
                                 },
-                            ))
+                            )
                         } else {
                             vec![]
                         }
                     })
                     .collect()
             } else {
-                let d = vec![p(2, 2), p(2, -2), p(2, 2), p(2, -2)];
+                let d = vec![p(2, 2), p(2, -2), p(-2, 2), p(-2, -2)];
 
                 d.into_iter()
-                    .filter(|d| is_valid_capture_move(*d))
+                    .filter(|d| (is_valid_capture_move(*(d))))
                     .filter_map(|d| {
                         let new_pos = i.pos + d;
                         let captured_pos = i.pos + d / 2;
@@ -610,7 +609,7 @@ mod test {
             [None, None, None, None, None, None, None, None, None, None],
         ];
 
-        let (white_moves, black_moves) = dbg!(list(board));
+        let (white_moves, black_moves) = list(board);
 
         assert_eq!(white_moves.len(), 1);
         assert!(iters_equal_anyorder(
@@ -622,6 +621,189 @@ mod test {
         assert!(iters_equal_anyorder(
             black_moves.iter(),
             [(vec![m(4, 1, 6, 3)], vec![(5, 2)])].iter()
+        ));
+    }
+
+    #[test]
+    fn stuck_man() {
+        let board = [
+            [None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None],
+            [
+                p('M', 'B'),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                None,
+                p('M', 'B'),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                None,
+                None,
+                p('M', 'W'),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None],
+        ];
+
+        let (white_moves, _) = list(board);
+
+        assert_eq!(white_moves.len(), 1);
+        assert!(iters_equal_anyorder(
+            white_moves.iter(),
+            [(vec![m(5, 2, 4, 3)], vec![])].iter()
+        ));
+    }
+
+    #[test]
+    fn multiple_capture_man() {
+        let board = [
+            [None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None],
+            [
+                None,
+                p('M', 'B'),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [None, None, None, None, None, None, None, None, None, None],
+            [
+                None,
+                p('M', 'B'),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                None,
+                None,
+                p('M', 'W'),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None],
+        ];
+
+        let (white_moves, black_moves) = list(board);
+
+        assert_eq!(white_moves.len(), 1);
+        assert!(iters_equal_anyorder(
+            white_moves.iter(),
+            [(vec![m(5, 2, 3, 0), m(3, 0, 1, 2)], vec![(4, 1), (2, 1)])].iter()
+        ));
+
+        assert_eq!(black_moves.len(), 1);
+        assert!(iters_equal_anyorder(
+            black_moves.iter(),
+            [(vec![m(4, 1, 6, 3)], vec![(5, 2)])].iter()
+        ));
+    }
+
+    #[test]
+    fn multiple_capture_backwards_man() {
+        let board = [
+            [None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None],
+            [
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [None, None, None, None, None, None, None, None, None, None],
+            [
+                None,
+                None,
+                None,
+                p('M', 'B'),
+                None,
+                p('M', 'B'),
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                None,
+                None,
+                p('M', 'W'),
+                None,
+                None,
+                None,
+                None,//
+                None,
+                None,
+                None,
+            ],
+            [None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None],
+        ];
+
+        let (white_moves, black_moves) = list(board);
+
+        assert_eq!(white_moves.len(), 1);
+        assert!(iters_equal_anyorder(
+            white_moves.iter(),
+            [(vec![m(5, 2, 3, 4), m(3, 4, 5, 6)], vec![(4, 3), (4, 5)])].iter()
+        ));
+
+        assert_eq!(black_moves.len(), 1);
+        assert!(iters_equal_anyorder(
+            black_moves.iter(),
+            [(vec![m(4, 3, 6, 1)], vec![(5, 2)])].iter()
         ));
     }
 
