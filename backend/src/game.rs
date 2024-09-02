@@ -406,14 +406,14 @@ impl GameState {
                     Some(Piece {
                         type_: PieceType::King,
                         player,
-                    }) if *player == self.current_player => dbg!(list_valid_moves_for_king(
+                    }) if *player == self.current_player => list_valid_moves_for_king(
                         self,
                         Intermediate {
                             pos,
                             captures: vec![],
                             moves: vec![],
                         },
-                    )),
+                    ),
                     _ => continue,
                 };
 
@@ -433,8 +433,6 @@ impl GameState {
                 );
             }
         }
-
-        dbg!(&available_moves);
 
         let max = available_moves.iter().map(|m| m.1.len()).max();
 

@@ -129,7 +129,6 @@ pub async fn post_submission(
     let lang = Language::from_str(lang.as_str())?;
 
     let path = PathBuf::from_str(format!("{}/{}", config().data_dir, user.name).as_str()).unwrap();
-    dbg!(&path);
 
     File::create(path.clone())
         .await
