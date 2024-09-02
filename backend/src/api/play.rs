@@ -10,7 +10,7 @@ use rocket::{
 use std::sync::{Arc, LazyLock};
 
 static AI_OUTPUT_REGEX: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new("^([A-J]\\d,[A-J]\\d;)+$").unwrap());
+    LazyLock::new(|| Regex::new("^(\\d{2},\\d{2};)+$").unwrap());
 
 #[derive(Debug)]
 pub struct Game {
@@ -19,8 +19,7 @@ pub struct Game {
 }
 
 fn convert_cell_id(id: &[char]) -> (usize, usize) {
-    dbg!(id);
-    (id[0] as usize - 'A' as usize, id[1] as usize - '0' as usize)
+    (id[0] as usize - '0' as usize, id[1] as usize - '0' as usize)
 }
 
 impl Game {

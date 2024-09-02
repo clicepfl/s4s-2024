@@ -12,8 +12,18 @@ struct Piece {
     Piece(char type, char color) : pieceType(type), pieceColor(color) {}
 };
 
+struct Position {
+    int row;
+    int column;
+};
+
+struct Move {
+    Position from;
+    Position to;
+};
+
 // Function to parse the board and return each cell's content as a vector of moves
-std::vector<std::vector<int>> findMove(const std::vector<std::vector<std::optional<Piece>>>& board, char playerColor) {
+std::vector<Move> findMove(const std::vector<std::vector<std::optional<Piece>>>& board, char playerColor) {
     // TODO: Implement logic to find the next move
     // The moves should be returned as a vector of 2-element vectors
     // The first element of the sequence should be the starting cell
@@ -50,7 +60,7 @@ int main() {
     }
 
     // Call the findMove function to find the next move
-    std::vector<std::vector<int>> moves = findMove(board, playerColor);
+    auto moves = findMove(board, playerColor);
 
     if (moves.empty()) {
         // No moves found
@@ -60,7 +70,9 @@ int main() {
 
     // Print the moves
     for (const auto& pos : moves) {
-        std::cout << pos[0] << "," << pos[1] << std::endl;
+        std::cout 
+            << pos.from.row << pos.from.column << "," 
+            << pos.to.row << pos.to.column << ";";
     }
 
     return 0;
