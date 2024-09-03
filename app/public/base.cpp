@@ -74,6 +74,7 @@ int main() {
             << pos.from.row << pos.from.column << "," 
             << pos.to.row << pos.to.column << ";";
     }
+    std::cout << std::endl;
 
     return 0;
 }

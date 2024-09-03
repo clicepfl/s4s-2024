@@ -1,8 +1,7 @@
 import java.util.List;
 import java.util.Scanner;
 
-public class CheckersBoardParser {
-
+public class base {
     private record Piece(char pieceType, char pieceColor) {}
     private record Position(int row, int column) {}
     private record Move(Position from, Position to) {}
@@ -52,11 +51,11 @@ public class CheckersBoardParser {
 
         // Print the moves
         for (Move move : moves) {
-            System.out.println(
+            System.out.print(
                 move.from.row + "" + move.from.column + "," 
                 + move.to.row + "" + move.to.column + ";"
             );
         }
-
+        System.out.println("");
     }
 }

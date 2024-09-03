@@ -1,8 +1,8 @@
-
 class Piece:
     def __init__(self, piece_type, piece_color):
         self.piece_type = piece_type
         self.piece_color = piece_color
+
 
 def find_move(board, player_color):
     # TODO: Implement logic to find the next move
@@ -11,8 +11,11 @@ def find_move(board, player_color):
     # Each subsequent 2-element list should contain the x and y coordinates of the cell to move to
     return []
 
+
 def main():
-    board = [[None for _ in range(10)] for _ in range(10)]  # Initialize a 10x10 board with None
+    board = [
+        [None for _ in range(10)] for _ in range(10)
+    ]  # Initialize a 10x10 board with None
 
     # Read the player's color
     player_color = input().strip()[0]
@@ -20,7 +23,7 @@ def main():
     # Read input line by line for the board
     for r in range(10):
         line = input().strip()
-        row = line.split(',')  # Split the line by commas
+        row = line.split(",")  # Split the line by commas
 
         # Parse each element to a Piece object or None
         for c, piece_code in enumerate(row):
@@ -39,7 +42,9 @@ def main():
 
     # Print the moves
     for pos in moves:
-        print(f"{pos[0][0]}{pos[0][1]},{pos[1][0]}{pos[1][1]};")
+        print(f"{pos[0][0]}{pos[0][1]},{pos[1][0]}{pos[1][1]};", end="")
+    print("")
+
 
 if __name__ == "__main__":
     main()
