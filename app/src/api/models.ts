@@ -16,6 +16,7 @@ export enum AIErrorType {
 export interface AIError {
   error: AIErrorType;
   ai_output: string;
+  move: MoveSequence | null;
 }
 
 export type Board = (Piece | null)[][];

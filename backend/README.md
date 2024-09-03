@@ -132,7 +132,7 @@ enum AIErrorType {
 
 interface AIError {
   error: AIErrorType,
-  ai_output: string
+  ai_output: string,
   move: Move[] | null
 }
 

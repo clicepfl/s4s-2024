@@ -81,10 +81,23 @@ export default function Home({ username }: { username: string }) {
           break;
         case AIErrorType.InvalidMove:
           setConsoleOutput(
-            consoleOutput.concat({
-              msg: "AI played invalid move",
-              msgType: ConsoleMessageType.Error,
-            })
+            consoleOutput
+              .concat({
+                msg: "AI played invalid move",
+                msgType: ConsoleMessageType.Error,
+              })
+              .concat({
+                msg: turnStatus.move
+                  ? turnStatus.move.map(
+                      (m) =>
+                        `Move from ${m.from} to ${m.to}` +
+                        (m.from[0] === m.to[0] && m.from[1] === m.to[1]
+                          ? " (same position)"
+                          : "")
+                    ).join("\n")
+                  : "No move provided",
+                msgType: ConsoleMessageType.Warning,
+              })
           );
           break;
         case AIErrorType.InvalidOutput:
@@ -226,8 +239,8 @@ export default function Home({ username }: { username: string }) {
                   </a>
                 </b>
                 {". "}
-                Attention! il existe plusieurs variantes du Jeu de Dames. En
-                cas de doute, fiez vous à ces règles.
+                Attention! il existe plusieurs variantes du Jeu de Dames. En cas
+                de doute, fiez vous à ces règles.
               </p>
               <p>
                 La première difficulté n'est pas de trouver une stratégie de
