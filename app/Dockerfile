@@ -4,8 +4,8 @@ RUN apk update
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
-ENV DIRECTUS_URL=https://clic.epfl.ch/directus
-ENV NEXT_PUBLIC_DIRECTUS_URL=https://clic.epfl.ch/directus
+ENV NEXT_PUBLIC_API_URL "https://clic.epfl.ch/s4s/api"
+ENV NEXT_PUBLIC_FRONTEND_URL "https://clic.epfl.ch/s4s"
 
 WORKDIR /app
 COPY package.json package-lock.json ./
