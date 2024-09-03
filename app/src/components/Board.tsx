@@ -13,6 +13,7 @@ import {
   initialBoards,
   MoveSequence,
   SingleMove,
+  TurnStatus,
 } from "../api/models";
 import {
   calculateBoardAfterMove,
@@ -29,6 +30,7 @@ type BoardProps = {
   setCurrentTurn: (player: Player) => void;
   board: BoardState;
   setBoard: (board: BoardState) => void;
+  updateGame: (turnStatus: TurnStatus | AIError) => void;
 };
 
 export default function Board({
@@ -39,6 +41,7 @@ export default function Board({
   setCurrentTurn,
   board, 
   setBoard,
+  updateGame,
 }: BoardProps) {
   
   const [currentMoveSequence, setCurrentMoveSequence] = useState<MoveSequence>(
@@ -106,23 +109,7 @@ export default function Board({
             ); // switch turn
             makeMove(newMoveSequence, username).then(
               (turnStatus) => {
-                if ("error" in turnStatus) {
-                  switch (turnStatus.error) {
-                    case AIErrorType.NoSubmission:
-                      alert("No submission found");
-                      break;
-                    case AIErrorType.InvalidMove:
-                      alert("AI Played Invalid move");
-                      break;
-                    case AIErrorType.InvalidOutput:
-                      alert("Invalid output");
-                      break;
-                  }
-                } else {
-                  // TODO: add buffer time before updating board ?
-                  setBoard(turnStatus.game.board); // update board with server response
-                  setCurrentTurn(turnStatus.game.current_player);
-                }
+                updateGame(turnStatus);
               },
               (error) => {
                 console.error(error);

@@ -4,11 +4,14 @@ import Editor from '@monaco-editor/react';
 import { useEffect, useState } from 'react';
 import Board from '@/components/Board';
 import {
+  AIError,
+  AIErrorType,
   Board as BoardState,
   emptyBoard,
   initialBoards,
   Player,
   SubmissionLanguage,
+  TurnStatus,
 } from '../api/models';
 import {
   createGame,
@@ -55,6 +58,27 @@ export default function Home({ username }: { username: string }) {
     }
   }
 
+  function updateGame(turnStatus: TurnStatus | AIError) {
+    if ("error" in turnStatus) {
+      switch (turnStatus.error) {
+        case AIErrorType.NoSubmission:
+          alert("No submission found");
+          break;
+        case AIErrorType.InvalidMove:
+          alert("AI Played Invalid move");
+          break;
+        case AIErrorType.InvalidOutput:
+          alert("Invalid output");
+          break;
+      }
+    } else {
+      setGameOngoing(true); // in case game created
+      // TODO: add buffer time before updating board ?
+      setBoard(turnStatus.game.board); // update board with server response
+      setCurrentTurn(turnStatus.game.current_player);
+    }
+  }
+
   return (
     <>
       <Head>
@@ -85,13 +109,7 @@ export default function Home({ username }: { username: string }) {
                 } else {
                   createGame(username, player == Player.White).then(
                     (turnStatus) => {
-                      if (turnStatus instanceof Error) {
-                        alert(turnStatus.message);
-                      } else {
-                        setGameOngoing(true);
-                        setBoard(turnStatus.game.board);
-                        setCurrentTurn(turnStatus.game.current_player);
-                      }
+                      updateGame(turnStatus);
                     },
                     (err) => alert(err.message)
                   );
@@ -162,6 +180,7 @@ export default function Home({ username }: { username: string }) {
                   setCurrentTurn={setCurrentTurn}
                   board={board}
                   setBoard={setBoard}
+                  updateGame={updateGame}
                 />
               </div>
               <div className="game-info">
