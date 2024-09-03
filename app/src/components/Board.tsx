@@ -80,7 +80,8 @@ export default function Board({
             from: [selectedPiece.x, selectedPiece.y],
             to: [x, y],
           };
-          setCurrentMoveSequence([...currentMoveSequence, singleMove]);
+          let newMoveSequence = currentMoveSequence.concat(singleMove);
+          setCurrentMoveSequence(newMoveSequence);
 
           // move piece on board
           let nextBoard = calculateBoardAfterMove(
@@ -101,7 +102,7 @@ export default function Board({
             setCurrentTurn(
               player == Player.White ? Player.Black : Player.White
             ); // switch turn
-            makeMove(currentMoveSequence, username).then(
+            makeMove(newMoveSequence, username).then(
               (turnStatus) => {
                 if (turnStatus instanceof Error) {
                   alert(turnStatus.message);
