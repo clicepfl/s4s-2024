@@ -226,7 +226,7 @@ export default function Home({ username }: { username: string }) {
                   </a>
                 </b>
                 {". "}
-                Attention ! il existe plusieurs variantes du Jeu de Dames. En
+                Attention! il existe plusieurs variantes du Jeu de Dames. En
                 cas de doute, fiez vous à ces règles.
               </p>
               <p>
