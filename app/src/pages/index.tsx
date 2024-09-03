@@ -1,8 +1,8 @@
-import Head from 'next/head';
-import { Inter } from 'next/font/google';
-import Editor from '@monaco-editor/react';
-import { useEffect, useState } from 'react';
-import Board from '@/components/Board';
+import Head from "next/head";
+import { Inter } from "next/font/google";
+import Editor from "@monaco-editor/react";
+import { useEffect, useState } from "react";
+import Board from "@/components/Board";
 import {
   AIError,
   AIErrorType,
@@ -12,27 +12,36 @@ import {
   Player,
   SubmissionLanguage,
   TurnStatus,
-} from '../api/models';
+} from "../api/models";
 import {
   createGame,
   loadSubmission,
   requireSession,
   stopGame,
   submitCode,
-} from '../api/api';
-import SwapIcon from '@/components/icons/SwapIcon';
-import { getInitialCode, initFiles } from '@/util/initCodeFiles';
-import { rotateBoard } from '@/util/checkersCalculator';
+} from "../api/api";
+import SwapIcon from "@/components/icons/SwapIcon";
+import { getInitialCode, initFiles } from "@/util/initCodeFiles";
+import { rotateBoard } from "@/util/checkersCalculator";
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ["latin"] });
 
 export default function Home({ username }: { username: string }) {
   const [selectedLang, setLang] = useState(SubmissionLanguage.Java);
-  const [file, setFile] = useState('');
+  const [file, setFile] = useState("");
   const [gameOngoing, setGameOngoing] = useState(false);
   const [player, setPlayer] = useState(Player.White);
   const [currentTurn, setCurrentTurn] = useState<Player | null>(null);
   const [board, setBoard] = useState(initialBoards[player]);
+
+  enum ConsoleMessageType {
+    Error = "error",
+    Info = "info",
+    Warning = "warning",
+    Success = "success",
+  }
+  type ConsoleMessage = { msg: string; msgType: ConsoleMessageType };
+  const [consoleOutput, setConsoleOutput] = useState<ConsoleMessage[]>([]);
 
   useEffect(() => {
     getInitialCode(SubmissionLanguage.Java).then((code) => setFile(code));
@@ -50,7 +59,7 @@ export default function Home({ username }: { username: string }) {
       // Otherwise, we ask for confirmation
       if (
         confirm(
-          'Are you sure ? Changing the language will overwrite your current code.'
+          "Are you sure ? Changing the language will overwrite your current code."
         )
       ) {
         setLang(lang);
@@ -63,18 +72,44 @@ export default function Home({ username }: { username: string }) {
     if ("error" in turnStatus) {
       switch (turnStatus.error) {
         case AIErrorType.NoSubmission:
-          alert("No submission found");
+          setConsoleOutput(
+            consoleOutput.concat({
+              msg: "No submission found",
+              msgType: ConsoleMessageType.Error,
+            })
+          );
           break;
         case AIErrorType.InvalidMove:
-          alert("AI Played Invalid move");
+          setConsoleOutput(
+            consoleOutput.concat({
+              msg: "AI played invalid move",
+              msgType: ConsoleMessageType.Error,
+            })
+          );
           break;
         case AIErrorType.InvalidOutput:
-          alert("Invalid output");
+          setConsoleOutput(
+            consoleOutput.concat({
+              msg: "AI sent invalid output",
+              msgType: ConsoleMessageType.Error,
+            })
+          );
           break;
       }
+
+      if (turnStatus.ai_output && turnStatus.ai_output.length > 0) {
+        setConsoleOutput(
+          consoleOutput
+            .concat({ msg: "AI error", msgType: ConsoleMessageType.Error })
+            .concat({
+              msg: turnStatus.ai_output,
+              msgType: ConsoleMessageType.Warning,
+            })
+        );
+      }
+
+      setGameOngoing(false);
     } else {
-      setGameOngoing(true); // in case game created
-      // TODO: add buffer time before updating board ?
       setBoard(rotateBoard(turnStatus.game.board, player)); // update board with server response
       setCurrentTurn(turnStatus.game.current_player);
     }
@@ -110,6 +145,8 @@ export default function Home({ username }: { username: string }) {
                 } else {
                   createGame(username, player == Player.White).then(
                     (turnStatus) => {
+                      setConsoleOutput([]);
+                      setGameOngoing(true);
                       updateGame(turnStatus);
                     },
                     (err) => alert(err.message)
@@ -117,13 +154,13 @@ export default function Home({ username }: { username: string }) {
                 }
               }}
             >
-              {gameOngoing ? 'Stop Game' : 'Start Game'}
+              {gameOngoing ? "Stop Game" : "Start Game"}
             </button>
             <button
               className="button"
               onClick={() =>
                 submitCode(selectedLang, file, username).then(
-                  () => alert('Code submitted !'),
+                  () => alert("Code submitted !"),
                   (err) => alert(err.message)
                 )
               }
@@ -136,7 +173,7 @@ export default function Home({ username }: { username: string }) {
               onClick={() => {
                 if (
                   confirm(
-                    'Are you sure ? Loading your last submission will overwrite your current code.'
+                    "Are you sure ? Loading your last submission will overwrite your current code."
                   )
                 ) {
                   loadSubmission(username).then(
@@ -185,9 +222,14 @@ export default function Home({ username }: { username: string }) {
                 />
               </div>
               <div className="game-info">
-                <p>Game State: {gameOngoing ? 'Ongoing' : 'Stopped'}</p>
-                <p>Current Turn: {currentTurn ?? 'None'}</p>
+                <p>Game State: {gameOngoing ? "Ongoing" : "Stopped"}</p>
+                <p>Current Turn: {currentTurn ?? "None"}</p>
                 <p>Player: {player}</p>
+                {consoleOutput.map((line, i) => (
+                  <p key={i} className={line.msgType}>
+                    {line.msg}
+                  </p>
+                ))}
               </div>
             </div>
           </div>

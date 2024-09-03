@@ -10,6 +10,8 @@
   --background-color: #fff;
   --secondary-background-color: #b1b1b1;
   --clic-red: #cb381b;
+  --warning-yellow: #f0ad4e;
+  --success-green: #5cb85c;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -190,6 +192,22 @@ main {
         height: 100%;
 
         overflow-y: auto;
+
+        .error {
+          color: var(--clic-red);
+        }
+
+        .info {
+          color: var(--foreground-color);
+        }
+
+        .warning {
+          color: var(--warning-yellow);
+        }
+
+        .success {
+          color: var(--success-green);
+        }
         
       }
     }
