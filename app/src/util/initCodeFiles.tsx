@@ -1,3 +1,4 @@
+import { API_URL } from '@/api/config';
 import { SubmissionLanguage } from '../api/models';
 
 export const initFiles: {
@@ -14,7 +15,7 @@ export const initFiles: {
 export async function getInitialCode(
   lang: SubmissionLanguage
 ): Promise<string> {
-  const path = `/base.${initFiles[lang].extension}`;
+  const path = `${API_URL}/base.${initFiles[lang].extension}`;
   const code = await fetch(path);
   return await code.text();
 }
