@@ -19,6 +19,7 @@ import {
   calculateBoardAfterMove,
   calculatePossibleMoves,
   MoveWithTakenAndRaffle,
+  rotateMove,
 } from "@/util/checkersCalculator";
 import { makeMove } from "@/api/api";
 
@@ -107,7 +108,7 @@ export default function Board({
             setCurrentTurn(
               player == Player.White ? Player.Black : Player.White
             ); // switch turn
-            makeMove(newMoveSequence, username).then(
+            makeMove(rotateMove(newMoveSequence, player), username).then(
               (turnStatus) => {
                 updateGame(turnStatus);
               },

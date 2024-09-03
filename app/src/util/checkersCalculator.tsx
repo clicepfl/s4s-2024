@@ -1,4 +1,4 @@
-import { Board, Piece, PieceType, Player } from "../api/models";
+import { Board, MoveSequence, Piece, PieceType, Player } from "../api/models";
 
 export type MoveWithTaken = {
   x: number;
@@ -362,4 +362,18 @@ export function rotateBoard(board: Board, player: Player): Board {
   let rotatedBoard = [...board].reverse().map(row => [...row].reverse());
 
   return rotatedBoard;
+}
+
+// Rotate the move so that the player is always at the bottom
+export function rotateMove(move: MoveSequence, player: Player): MoveSequence {
+  if (player === Player.White) {
+    return move;
+  }
+
+  return move.map((m) => {
+    return {
+      from: [9 - m.from[0], 9 - m.from[1]],
+      to: [9 - m.to[0], 9 - m.to[1]],
+    };
+  });
 }
