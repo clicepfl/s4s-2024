@@ -176,14 +176,21 @@ main {
       }
 
       .game-info {
-        display: flex;
-        flex-direction: column;
-        gap: .5em;
-        background-color: black;
-        width: 50%;
-        height: 100%;
+        font-family: var(--font-mono);
+        font-size: 0.9rem;
+        background-color: #101010;
+
         outline: 10px solid var(--background-color);
         padding: 1em;
+
+        display: flex;
+        flex-direction: column;
+        gap: .3em;
+        width: 50%;
+        height: 100%;
+
+        overflow-y: auto;
+        
       }
     }
   }
