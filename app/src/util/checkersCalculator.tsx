@@ -152,8 +152,6 @@ function calculateKingTakeMoves(
             break;
           }
 
-          console.log("Adding move", newX, newY, takenX, takenY);
-
           moves.push({ x: newX, y: newY, taken: { x: takenX, y: takenY } });
 
           newX += dir.x;
@@ -349,7 +347,6 @@ export function calculatePossibleMoves(
   }
 
   let moveSequences = calculateMoveSequences(board, piece, x, y);
-  console.log(moveSequences);
 
   return moveSequences.map((moveSequence) => {
     return { ...moveSequence[0], raffle: moveSequence.length > 1 };
