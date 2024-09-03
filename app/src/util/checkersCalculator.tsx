@@ -352,3 +352,14 @@ export function calculatePossibleMoves(
     return { ...moveSequence[0], raffle: moveSequence.length > 1 };
   });
 }
+
+// Rotate the board so that the player is always at the bottom
+export function rotateBoard(board: Board, player: Player): Board {
+  if (player === Player.White) {
+    return board;
+  }
+
+  let rotatedBoard = [...board].reverse().map(row => [...row].reverse());
+
+  return rotatedBoard;
+}

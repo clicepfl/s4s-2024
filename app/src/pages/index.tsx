@@ -22,6 +22,7 @@ import {
 } from '../api/api';
 import SwapIcon from '@/components/icons/SwapIcon';
 import { getInitialCode, initFiles } from '@/util/initCodeFiles';
+import { rotateBoard } from '@/util/checkersCalculator';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -74,7 +75,7 @@ export default function Home({ username }: { username: string }) {
     } else {
       setGameOngoing(true); // in case game created
       // TODO: add buffer time before updating board ?
-      setBoard(turnStatus.game.board); // update board with server response
+      setBoard(rotateBoard(turnStatus.game.board, player)); // update board with server response
       setCurrentTurn(turnStatus.game.current_player);
     }
   }
