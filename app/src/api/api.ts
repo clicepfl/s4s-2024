@@ -41,7 +41,7 @@ async function apiCall(
   return await fetch(`${API_URL}/${uri}`, {
     method: method || "GET",
     body:
-      typeof body === "string" ? body : body ? JSON.stringify(body) : undefined,
+    body ? (typeof body === "string" ? body : JSON.stringify(body)) : undefined,
     headers,
   });
 }
