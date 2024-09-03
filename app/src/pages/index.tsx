@@ -206,7 +206,38 @@ export default function Home({ username }: { username: string }) {
         <div className="main-content">
           <div className="side-panel">
             <div className="instructions">
-              <p>Welcome {username} !</p>
+              <p>Bienvenu {username} !</p>
+              <p>
+                Votre objectif est de programmer une <b>IA qui joue au Dames</b>
+                . A chaque tour, la fonction "findMove" que vous allez coder
+                sera appelée pour déterminer le coup (ou la séquence de coups) à
+                jouer. Vous pouvez jouer manuellement contre l’IA pour la
+                tester.
+              </p>
+              <p>
+                Pour commencer, voici le lien vers les{" "}
+                <b>
+                  <a
+                    href="http://www.ffjd.fr/fichiers/livres/livret-ffjd.pdf"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    règles du Jeu de Dames International
+                  </a>
+                </b>
+                {". "}
+                Attention ! il existe plusieurs variantes du Jeu de Dames. En
+                cas de doute, fiez vous à ces règles.
+              </p>
+              <p>
+                La première difficulté n'est pas de trouver une stratégie de
+                jeu, mais de commencer par programmer votre IA pour qu'elle
+                renvoie toujours un <b>coup valide</b>, ce qui n'est pas facile!
+                Comme un coup n'est valide que si il n'y a pas d'autre coup
+                possible avec une plus grande priorité, il faut en théorie
+                calculer tout les coups (voire séquences de coups si il y a des
+                raffles) pour déterminer lesquels sont valides.
+              </p>
             </div>
             <div className="game">
               <div className="simulation">
@@ -222,9 +253,15 @@ export default function Home({ username }: { username: string }) {
                 />
               </div>
               <div className="game-info">
-                <p><b>Game State:</b> {gameOngoing ? "Ongoing" : "Stopped"}</p>
-                <p><b>Current Turn:</b> {currentTurn ?? "None"}</p>
-                <p><b>Human Player:</b> {player}</p>
+                <p>
+                  <b>Game State:</b> {gameOngoing ? "Ongoing" : "Stopped"}
+                </p>
+                <p>
+                  <b>Current Turn:</b> {currentTurn ?? "None"}
+                </p>
+                <p>
+                  <b>Human Player:</b> {player}
+                </p>
                 {consoleOutput.map((line, i) => (
                   <p key={i} className={line.msgType}>
                     {line.msg}

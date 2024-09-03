@@ -163,9 +163,17 @@ main {
     justify-content: space-between;
     align-items: center;
 
+    overflow-y: auto;
+    overflow-x: hidden;
+
     .instructions {
       width: 100%;
       margin: 1em;
+      font-size: 1rem;
+
+      p {
+        margin-bottom: 1em;
+      }
     }
 
     .game {
