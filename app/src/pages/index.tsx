@@ -222,9 +222,9 @@ export default function Home({ username }: { username: string }) {
                 />
               </div>
               <div className="game-info">
-                <p>Game State: {gameOngoing ? "Ongoing" : "Stopped"}</p>
-                <p>Current Turn: {currentTurn ?? "None"}</p>
-                <p>Player: {player}</p>
+                <p><b>Game State:</b> {gameOngoing ? "Ongoing" : "Stopped"}</p>
+                <p><b>Current Turn:</b> {currentTurn ?? "None"}</p>
+                <p><b>Human Player:</b> {player}</p>
                 {consoleOutput.map((line, i) => (
                   <p key={i} className={line.msgType}>
                     {line.msg}
