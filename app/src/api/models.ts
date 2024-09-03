@@ -2,10 +2,20 @@ export interface GameState {
   board: Board;
   current_player: Player;
 }
-
 export interface TurnStatus {
   game: GameState;
   ai_output: string; // Everything printed by the AI on stderr since the start/last move.
+}
+
+export enum AIErrorType {
+  NoSubmission = "noSubmission",
+  InvalidMove = "invalidMove",
+  InvalidOutput = "invalidOutput",
+}
+
+export interface AIError {
+  error: AIErrorType;
+  ai_output: string;
 }
 
 export type Board = (Piece | null)[][];

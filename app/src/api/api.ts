@@ -4,7 +4,7 @@ import {
   GetServerSidePropsResult,
 } from "next";
 import { API_URL, SESSION_COOKIE_NAME } from "./config";
-import { GameState, MoveSequence, SubmissionLanguage, TurnStatus } from "./models";
+import { AIError, GameState, MoveSequence, SubmissionLanguage, TurnStatus } from "./models";
 
 export function requireSession<T extends { [key: string]: any }>(
   onSuccess: (
@@ -57,7 +57,7 @@ export async function login(username: string): Promise<boolean> {
 export async function createGame(
   session: string,
   isFirstPlayer: boolean
-): Promise<TurnStatus | Error> {
+): Promise<TurnStatus | AIError> {
   return await (
     await apiCall(`game/start?is_first_player=${isFirstPlayer}`, {
       session,
@@ -68,14 +68,14 @@ export async function createGame(
 
 export async function getGameState(
   session: string
-): Promise<TurnStatus | Error> {
+): Promise<TurnStatus | AIError> {
   return await (await apiCall("game", { session, method: "GET" })).json();
 }
 
 export async function makeMove(
   moves: MoveSequence,
   session: string
-): Promise<TurnStatus | Error> {
+): Promise<TurnStatus | AIError> {
   return await (
     await apiCall("game", { session, body: moves, method: "POST" })
   ).json();

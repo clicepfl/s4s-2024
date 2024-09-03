@@ -3,6 +3,8 @@
 
 import React, { use, useEffect, useState } from "react";
 import {
+  AIError,
+  AIErrorType,
   Board as BoardState,
   Piece,
   Player,
@@ -77,8 +79,8 @@ export default function Board({
         if (playedMove != null) {
           // add move to current sequence
           let singleMove: SingleMove = {
-            from: [selectedPiece.x, selectedPiece.y],
-            to: [x, y],
+            from: [selectedPiece.y, selectedPiece.x],
+            to: [y, x],
           };
           let newMoveSequence = currentMoveSequence.concat(singleMove);
           setCurrentMoveSequence(newMoveSequence);
@@ -104,8 +106,18 @@ export default function Board({
             ); // switch turn
             makeMove(newMoveSequence, username).then(
               (turnStatus) => {
-                if (turnStatus instanceof Error) {
-                  alert(turnStatus.message);
+                if ("error" in turnStatus) {
+                  switch (turnStatus.error) {
+                    case AIErrorType.NoSubmission:
+                      alert("No submission found");
+                      break;
+                    case AIErrorType.InvalidMove:
+                      alert("AI Played Invalid move");
+                      break;
+                    case AIErrorType.InvalidOutput:
+                      alert("Invalid output");
+                      break;
+                  }
                 } else {
                   // TODO: add buffer time before updating board ?
                   setBoard(turnStatus.game.board); // update board with server response
