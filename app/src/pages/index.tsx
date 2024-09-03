@@ -88,13 +88,12 @@ export default function Home({ username }: { username: string }) {
               })
               .concat({
                 msg: turnStatus.move
-                  ? turnStatus.move.map(
-                      (m) =>
-                        `Move from ${m.from} to ${m.to}` +
-                        (m.from[0] === m.to[0] && m.from[1] === m.to[1]
-                          ? " (same position)"
-                          : "")
-                    ).join("\n")
+                  ? turnStatus.move.length == 1
+                    ? `Move from ${turnStatus.move[0].from} to ${turnStatus.move[0].to} is invalid`
+                    : "Sequence of moves is invalid :" +
+                      turnStatus.move
+                        .map((m) => `-> Move from ${m.from} to ${m.to}`)
+                        .join("\n")
                   : "No move provided",
                 msgType: ConsoleMessageType.Warning,
               })
