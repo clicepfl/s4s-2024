@@ -163,6 +163,7 @@ main {
 
     .instructions {
       width: 100%;
+      margin: 1em;
     }
 
     .game {
@@ -178,6 +179,11 @@ main {
         display: flex;
         flex-direction: column;
         gap: .5em;
+        background-color: black;
+        width: 50%;
+        height: 100%;
+        outline: 10px solid var(--background-color);
+        padding: 1em;
       }
     }
   }
