@@ -53,6 +53,7 @@ impl Game {
             return Err(Error::AIFailed {
                 error: super::AIError::InvalidOutput,
                 ai_output,
+                move_: None,
             });
         }
 
@@ -73,6 +74,7 @@ impl Game {
             return Err(Error::AIFailed {
                 error: super::AIError::InvalidMove,
                 ai_output,
+                move_: Some(seq),
             });
         }
 

@@ -10,6 +10,8 @@ use serde::Serialize;
 use std::{collections::HashMap, io::Cursor, sync::Arc};
 use submissions::Submission;
 
+use crate::game::Move;
+
 pub mod contest;
 pub mod play;
 pub mod submissions;
@@ -64,7 +66,12 @@ pub enum Error {
     InvalidLanguage,
     NotFound,
     InvalidMove,
-    AIFailed { error: AIError, ai_output: String },
+    AIFailed {
+        error: AIError,
+        ai_output: String,
+        #[serde(rename = "move")]
+        move_: Option<Vec<Move>>,
+    },
     Unauthorized,
     GameAlreadyInProgress,
 }

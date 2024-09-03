@@ -115,7 +115,7 @@ impl Default for GameState {
 pub type Position = (usize, usize);
 pub type MoveSequence = (Vec<Move>, Vec<Position>);
 
-#[derive(Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Move {
     pub from: Position,
     pub to: Position,

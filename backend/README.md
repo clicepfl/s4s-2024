@@ -42,9 +42,7 @@ Plays a sequence of moves. The moves must match the game's rules. Must be used w
 
 ### Request Body
 
-```ts
-type Body = { from: [number, number]; to: [number, number] }[];
-```
+A `Move[]`.
 
 ### Response
 
@@ -135,5 +133,11 @@ enum AIErrorType {
 interface AIError {
   error: AIErrorType,
   ai_output: string
+  move: Move[] | null
 }
+
+interface Move { 
+  from: [number, number]; 
+  to: [number, number] 
+};
 ```

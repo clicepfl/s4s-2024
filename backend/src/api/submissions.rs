@@ -60,6 +60,7 @@ impl Submission {
             return Err(Error::AIFailed {
                 error: super::AIError::EmptySubmission,
                 ai_output: "".to_owned(),
+                move_: None,
             });
         }
 

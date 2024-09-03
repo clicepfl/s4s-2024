@@ -1,7 +1,7 @@
-use api::{Error, State};
+use api::State;
 use rocket::fairing::{Fairing, Info, Kind};
 use rocket::http::{ContentType, Header, Method, Status};
-use rocket::{get, launch, routes};
+use rocket::launch;
 use rocket::{Request, Response};
 use std::sync::Mutex;
 
@@ -37,13 +37,6 @@ impl Fairing for CORS {
         }
     }
 }
-#[get("/")]
-async fn test() -> Result<(), Error> {
-    Err(Error::AIFailed {
-        error: api::AIError::EmptySubmission,
-        ai_output: "aaaaaaaaaa".to_owned(),
-    })
-}
 
 #[launch]
 fn rocket() -> _ {
@@ -53,5 +46,4 @@ fn rocket() -> _ {
         .attach(CORS {})
         .manage(Mutex::<State>::default())
         .mount("/", api::routes())
-        .mount("/", routes![test])
 }
