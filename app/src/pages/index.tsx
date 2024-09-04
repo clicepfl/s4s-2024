@@ -90,10 +90,10 @@ export default function Home({ username }: { username: string }) {
                 msg: turnStatus.move
                   ? turnStatus.move.length == 1
                     ? `Move from ${turnStatus.move[0].from} to ${turnStatus.move[0].to} is invalid`
-                    : "Sequence of moves is invalid : " +
+                    : "Sequence of moves is invalid : \n" +
                       turnStatus.move
-                        .map((m) => `\n-> Move from ${m.from} to ${m.to}`)
-                        .join("")
+                        .map((m) => `-> Move from ${m.from} to ${m.to}`)
+                        .join("\n")
                   : "No move provided",
                 msgType: ConsoleMessageType.Warning,
               })
@@ -277,9 +277,9 @@ export default function Home({ username }: { username: string }) {
                   <b>Human Player:</b> {player}
                 </p>
                 {consoleOutput.map((line, i) => (
-                  <p key={i} className={line.msgType}>
+                  <pre key={i} className={line.msgType}>
                     {line.msg}
-                  </p>
+                  </pre>
                 ))}
               </div>
             </div>
