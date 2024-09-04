@@ -90,10 +90,10 @@ export default function Home({ username }: { username: string }) {
                 msg: turnStatus.move
                   ? turnStatus.move.length == 1
                     ? `Move from ${turnStatus.move[0].from} to ${turnStatus.move[0].to} is invalid`
-                    : "Sequence of moves is invalid :" +
+                    : "Sequence of moves is invalid : " +
                       turnStatus.move
-                        .map((m) => `-> Move from ${m.from} to ${m.to}`)
-                        .join("\n")
+                        .map((m) => `\n-> Move from ${m.from} to ${m.to}`)
+                        .join("")
                   : "No move provided",
                 msgType: ConsoleMessageType.Warning,
               })
@@ -159,6 +159,7 @@ export default function Home({ username }: { username: string }) {
                     (turnStatus) => {
                       setConsoleOutput([]);
                       setGameOngoing(true);
+                      setPlayer(player) // trigger re-render
                       updateGame(turnStatus);
                     },
                     (err) => alert(err.message)
