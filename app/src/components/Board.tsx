@@ -22,6 +22,7 @@ import {
   rotateMove,
 } from "@/util/checkersCalculator";
 import { makeMove } from "@/api/api";
+import { ConsoleMessage } from "@/pages";
 
 type BoardProps = {
   username: string;
@@ -31,7 +32,10 @@ type BoardProps = {
   setCurrentTurn: (player: Player) => void;
   board: BoardState;
   setBoard: (board: BoardState) => void;
-  updateGame: (turnStatus: TurnStatus | AIError) => void;
+  updateGame: (
+    turnStatus: TurnStatus | AIError,
+    initialConsoleOutput?: ConsoleMessage[]
+  ) => void;
 };
 
 export default function Board({
@@ -40,18 +44,13 @@ export default function Board({
   gameOngoing,
   currentTurn,
   setCurrentTurn,
-  board, 
+  board,
   setBoard,
   updateGame,
 }: BoardProps) {
-  
   const [currentMoveSequence, setCurrentMoveSequence] = useState<MoveSequence>(
     []
   );
-
-  useEffect(() => {
-    setBoard(initialBoards[player]);
-  }, [player]); // player can only change when the game is not ongoing
 
   const [selectedPiece, setSelectedPiece] = useState<{
     x: number;

@@ -26,6 +26,14 @@ import { rotateBoard } from "@/util/checkersCalculator";
 
 const inter = Inter({ subsets: ["latin"] });
 
+export enum ConsoleMessageType {
+  Error = "error",
+  Info = "info",
+  Warning = "warning",
+  Success = "success",
+}
+export type ConsoleMessage = { msg: string; msgType: ConsoleMessageType };
+
 export default function Home({ username }: { username: string }) {
   const [selectedLang, setLang] = useState(SubmissionLanguage.Java);
   const [file, setFile] = useState("");
@@ -34,18 +42,15 @@ export default function Home({ username }: { username: string }) {
   const [currentTurn, setCurrentTurn] = useState<Player | null>(null);
   const [board, setBoard] = useState(initialBoards[player]);
 
-  enum ConsoleMessageType {
-    Error = "error",
-    Info = "info",
-    Warning = "warning",
-    Success = "success",
-  }
-  type ConsoleMessage = { msg: string; msgType: ConsoleMessageType };
   const [consoleOutput, setConsoleOutput] = useState<ConsoleMessage[]>([]);
 
   useEffect(() => {
     getInitialCode(SubmissionLanguage.Java).then((code) => setFile(code));
   }, []);
+
+  useEffect(() => {
+    setBoard(initialBoards[player]);
+  }, [player]); // player can only change when the game is not ongoing
 
   async function changeLang(lang: SubmissionLanguage) {
     const currentInitialCode = await getInitialCode(selectedLang);
@@ -68,57 +73,56 @@ export default function Home({ username }: { username: string }) {
     }
   }
 
-  function updateGame(turnStatus: TurnStatus | AIError) {
+  function updateGame(
+    turnStatus: TurnStatus | AIError,
+    initialConsoleOutput?: ConsoleMessage[]
+  ) {
+    let newConsoleOutput = initialConsoleOutput ?? consoleOutput;
+
     if ("error" in turnStatus) {
       switch (turnStatus.error) {
         case AIErrorType.NoSubmission:
-          setConsoleOutput(
-            consoleOutput.concat({
-              msg: "No submission found",
-              msgType: ConsoleMessageType.Error,
-            })
-          );
+          newConsoleOutput = newConsoleOutput.concat({
+            msg: "No submission found",
+            msgType: ConsoleMessageType.Error,
+          });
           break;
         case AIErrorType.InvalidMove:
-          setConsoleOutput(
-            consoleOutput
-              .concat({
-                msg: "AI played invalid move",
-                msgType: ConsoleMessageType.Error,
-              })
-              .concat({
-                msg: turnStatus.move
-                  ? turnStatus.move.length == 1
-                    ? `Move from ${turnStatus.move[0].from} to ${turnStatus.move[0].to} is invalid`
-                    : "Sequence of moves is invalid : \n" +
-                      turnStatus.move
-                        .map((m) => `-> Move from ${m.from} to ${m.to}`)
-                        .join("\n")
-                  : "No move provided",
-                msgType: ConsoleMessageType.Warning,
-              })
-          );
-          break;
-        case AIErrorType.InvalidOutput:
-          setConsoleOutput(
-            consoleOutput.concat({
-              msg: "AI sent invalid output",
+          newConsoleOutput = newConsoleOutput
+            .concat({
+              msg: "AI played invalid move",
               msgType: ConsoleMessageType.Error,
             })
-          );
+            .concat({
+              msg: turnStatus.move
+                ? turnStatus.move.length == 1
+                  ? `Move from ${turnStatus.move[0].from} to ${turnStatus.move[0].to} is invalid`
+                  : "Sequence of moves is invalid : \n" +
+                    turnStatus.move
+                      .map((m) => `-> Move from ${m.from} to ${m.to}`)
+                      .join("\n")
+                : "No move provided",
+              msgType: ConsoleMessageType.Warning,
+            });
+          break;
+        case AIErrorType.InvalidOutput:
+          newConsoleOutput = newConsoleOutput.concat({
+            msg: "AI sent invalid output",
+            msgType: ConsoleMessageType.Error,
+          });
           break;
       }
 
       if (turnStatus.ai_output && turnStatus.ai_output.length > 0) {
-        setConsoleOutput(
-          consoleOutput
-            .concat({ msg: "AI error", msgType: ConsoleMessageType.Error })
-            .concat({
-              msg: turnStatus.ai_output,
-              msgType: ConsoleMessageType.Warning,
-            })
-        );
+        newConsoleOutput = newConsoleOutput
+          .concat({ msg: "AI error", msgType: ConsoleMessageType.Error })
+          .concat({
+            msg: turnStatus.ai_output,
+            msgType: ConsoleMessageType.Warning,
+          });
       }
+
+      setConsoleOutput(newConsoleOutput);
 
       setGameOngoing(false);
     } else {
@@ -155,12 +159,12 @@ export default function Home({ username }: { username: string }) {
                   stopGame(username);
                   setGameOngoing(false);
                 } else {
+                  setBoard(initialBoards[player]);
+                  setConsoleOutput([]);
                   createGame(username, player == Player.White).then(
                     (turnStatus) => {
-                      setConsoleOutput([]);
                       setGameOngoing(true);
-                      setPlayer(player) // trigger re-render
-                      updateGame(turnStatus);
+                      updateGame(turnStatus, []);
                     },
                     (err) => alert(err.message)
                   );
@@ -251,7 +255,10 @@ export default function Home({ username }: { username: string }) {
                 calculer tout les coups (voire séquences de coups si il y a des
                 raffles) pour déterminer lesquels sont valides.
               </p>
-              <p>Note : les coups a retourner sont au format row, column à chaque fois.</p>
+              <p>
+                Note : les coups a retourner sont au format row, column à chaque
+                fois.
+              </p>
             </div>
             <div className="game">
               <div className="simulation">
