@@ -44,6 +44,11 @@ export default function Home({ username }: { username: string }) {
 
   const [consoleOutput, setConsoleOutput] = useState<ConsoleMessage[]>([]);
 
+  const [lastSubmission, setLastSubmission] = useState<{
+    lang: SubmissionLanguage;
+    code: string;
+  } | null>(null);
+
   useEffect(() => {
     getInitialCode(SubmissionLanguage.Java).then((code) => setFile(code));
   }, []);
@@ -177,12 +182,15 @@ export default function Home({ username }: { username: string }) {
               className="button"
               onClick={() =>
                 submitCode(selectedLang, file, username).then(
-                  () => alert("Code submitted !"),
+                  () => {
+                    alert("Code submitted !");
+                    setLastSubmission({ lang: selectedLang, code: file });
+                  },
                   (err) => alert(err.message)
                 )
               }
             >
-              Submit
+              Submit {(lastSubmission == null || lastSubmission.lang != selectedLang || lastSubmission.code != file) ? "✗" : "✓"} 
             </button>
 
             <button
