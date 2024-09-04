@@ -1,4 +1,5 @@
 use api::State;
+use docker::pull_required_images;
 use rocket::fairing::{Fairing, Info, Kind};
 use rocket::http::{ContentType, Header, Method, Status};
 use rocket::launch;
@@ -7,6 +8,7 @@ use std::sync::Mutex;
 
 pub mod api;
 pub mod config;
+pub mod docker;
 pub mod game;
 
 pub struct CORS;
@@ -42,8 +44,10 @@ impl Fairing for CORS {
 fn rocket() -> _ {
     config::config();
 
+    pull_required_images();
+
     rocket::build()
         .attach(CORS {})
-        .manage(Mutex::<State>::default())
+        .manage(Mutex::new(State::load().unwrap()))
         .mount("/", api::routes())
 }

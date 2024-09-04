@@ -1,4 +1,7 @@
-use crate::config::config;
+use crate::{
+    config::config,
+    docker::{CPP_IMAGE, JAVA_IMAGE, PYTHON_IMAGE},
+};
 
 use super::{AppState, Error, User};
 use async_process::{Child, Command};
@@ -12,14 +15,24 @@ use rocket::{
     },
 };
 use serde::{Deserialize, Serialize};
-use std::{path::PathBuf, process::Stdio, str::FromStr};
+use std::{fmt::Display, path::PathBuf, process::Stdio, str::FromStr};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 #[serde(rename_all = "lowercase")]
-enum Language {
+pub enum Language {
     Cpp,
     Java,
     Python,
+}
+
+impl Display for Language {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(match self {
+            Language::Cpp => "cpp",
+            Language::Java => "java",
+            Language::Python => "python",
+        })
+    }
 }
 
 impl FromStr for Language {
@@ -37,9 +50,9 @@ impl FromStr for Language {
 
 #[derive(Clone, Debug)]
 pub struct Submission {
-    name: String,
-    lang: Language,
-    code: PathBuf,
+    pub name: String,
+    pub lang: Language,
+    pub code: PathBuf,
 }
 
 impl Submission {
@@ -77,11 +90,19 @@ impl Submission {
 
         let (image, command) = match self.lang {
             Language::Cpp => (
-                "ghcr.io/clicepfl/s4s-2024-cpp:main",
-                format!("echo {base_code} | base64 -d > /script.cpp && g++ /script.cpp -o /exe && /exe"),
+                CPP_IMAGE,
+                format!(
+                    "echo {base_code} | base64 -d > /script.cpp && g++ /script.cpp -o /exe && /exe"
+                ),
             ),
-            Language::Java => ("cimg/openjdk:17.0", format!("echo {base_code} | base64 -d > /script.java && java /script.java")),
-            Language::Python => ("python:3-bullseye", format!("echo {base_code} | base64 -d > /script.py && python /script.py")),
+            Language::Java => (
+                JAVA_IMAGE,
+                format!("echo {base_code} | base64 -d > /script.java && java /script.java"),
+            ),
+            Language::Python => (
+                PYTHON_IMAGE,
+                format!("echo {base_code} | base64 -d > /script.py && python /script.py"),
+            ),
         };
 
         Command::new("docker")
@@ -140,7 +161,10 @@ pub async fn post_submission(
 ) -> Result<(), Error> {
     let lang = Language::from_str(lang.as_str())?;
 
-    let path = PathBuf::from_str(format!("{}/{}", config().data_dir, user.name).as_str()).unwrap();
+    let path = PathBuf::from_str(
+        format!("{}/{}.{}", config().data_dir, user.name, lang.to_string()).as_str(),
+    )
+    .unwrap();
 
     File::create(path.clone())
         .await

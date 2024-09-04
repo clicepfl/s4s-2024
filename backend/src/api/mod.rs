@@ -7,10 +7,10 @@ use rocket::{
     routes, Request, Response, Route,
 };
 use serde::Serialize;
-use std::{collections::HashMap, io::Cursor, sync::Arc};
-use submissions::Submission;
+use std::{collections::HashMap, fs::read_dir, io::Cursor, str::FromStr, sync::Arc};
+use submissions::{Language, Submission};
 
-use crate::game::Move;
+use crate::{config::config, game::Move};
 
 pub mod contest;
 pub mod play;
@@ -20,6 +20,32 @@ pub mod submissions;
 pub struct State {
     pub submissions: HashMap<String, Submission>,
     pub games: HashMap<String, Arc<rocket::tokio::sync::Mutex<Game>>>,
+}
+
+impl State {
+    pub fn load() -> Result<Self, Error> {
+        Ok(State {
+            submissions: read_dir(config().data_dir.clone())?
+                .filter_map(|d| d.ok())
+                .filter(|d| d.file_type().is_ok_and(|t| t.is_file()))
+                .map(|d| {
+                    let file_name = d.file_name();
+                    let binding = dbg!(file_name.into_string().unwrap());
+                    let (name, lang) = binding.rsplit_once('.').unwrap();
+
+                    (
+                        name.to_string(),
+                        Submission {
+                            name: name.to_string(),
+                            lang: Language::from_str(lang).unwrap(),
+                            code: d.path(),
+                        },
+                    )
+                })
+                .collect(),
+            ..Default::default()
+        })
+    }
 }
 
 pub type AppState = rocket::State<std::sync::Mutex<State>>;
