@@ -2,11 +2,12 @@ use crate::config::config;
 
 use super::{AppState, Error, User};
 use async_process::{Child, Command};
+use base64::{prelude::BASE64_STANDARD, Engine};
 use rocket::{
     get, post,
     serde::json::Json,
     tokio::{
-        fs::File,
+        fs::{self, File},
         io::{AsyncReadExt, AsyncWriteExt},
     },
 };
@@ -54,8 +55,8 @@ impl Submission {
         })
     }
 
-    pub fn start(&self) -> Result<Child, Error> {
-        let metadata = std::fs::metadata(self.code.clone());
+    pub async fn start(&self) -> Result<Child, Error> {
+        let metadata = fs::metadata(self.code.clone()).await;
         if metadata.is_err() || metadata.is_ok_and(|m| m.len() == 0) {
             return Err(Error::AIFailed {
                 error: super::AIError::EmptySubmission,
@@ -64,16 +65,23 @@ impl Submission {
             });
         }
 
+        let base_code = {
+            let mut code = String::new();
+            File::open(self.code.clone())
+                .await?
+                .read_to_string(&mut code)
+                .await?;
+
+            BASE64_STANDARD.encode(code.as_bytes())
+        };
+
         let (image, command) = match self.lang {
             Language::Cpp => (
                 "ghcr.io/clicepfl/s4s-2024-cpp:main",
-                "cp /script /script.cpp && g++ /script.cpp -o /exe && /exe",
+                format!("echo {base_code} | base64 -d > /script.cpp && g++ /script.cpp -o /exe && /exe"),
             ),
-            Language::Java => (
-                "cimg/openjdk:17.0",
-                "cp /script /script.java && java /script.java",
-            ),
-            Language::Python => ("python:3-bullseye", "python /script"),
+            Language::Java => ("cimg/openjdk:17.0", format!("echo {base_code} | base64 -d > /script.java && java /script.java")),
+            Language::Python => ("python:3-bullseye", format!("echo {base_code} | base64 -d > /script.py && python /script.py")),
         };
 
         Command::new("docker")
@@ -81,13 +89,11 @@ impl Submission {
                 "run",
                 "-u",
                 "root",
-                "-v",
-                format!("{}:/script", self.code.to_string_lossy()).as_str(),
                 "-i",
                 image,
                 "sh",
                 "-c",
-                command,
+                command.as_str(),
             ])
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())

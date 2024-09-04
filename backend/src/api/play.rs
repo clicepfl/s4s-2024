@@ -24,7 +24,7 @@ fn convert_cell_id(id: &[char]) -> (usize, usize) {
 
 impl Game {
     pub async fn play_ai(&mut self, submission: Submission) -> Result<String, Error> {
-        let mut child = submission.start()?;
+        let mut child = submission.start().await?;
 
         let mut stdin = child.stdin.take().unwrap();
         let mut stdout = BufReader::new(child.stdout.take().unwrap());

@@ -1,13 +1,21 @@
 # Setup runtime image
-FROM debian:bookworm AS runtime
-RUN apt-get update && apt-get upgrade -y && apt-get install -y ca-certificates openssl
+FROM docker:latest AS runtime
+
+RUN apk update --no-cache
+RUN apk upgrade --no-cache
+RUN apk add ca-certificates openssl
 
 # Build on a dedicated image to avoid build output in final image
-FROM rust:latest AS rust_build
+FROM rust:alpine AS rust_build
+
+RUN apk add musl-dev
+
 # cargo-build-deps is a tool to only install and build dependencies
 RUN cargo install cargo-build-deps
+
 RUN cargo new app
 WORKDIR /app
+
 COPY Cargo.toml Cargo.lock ./
 RUN cargo build-deps --release
 
