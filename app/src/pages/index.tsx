@@ -251,6 +251,7 @@ export default function Home({ username }: { username: string }) {
                 calculer tout les coups (voire séquences de coups si il y a des
                 raffles) pour déterminer lesquels sont valides.
               </p>
+              <p>Note : les coups a retourner sont au format row, column à chaque fois.</p>
             </div>
             <div className="game">
               <div className="simulation">
