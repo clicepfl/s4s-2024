@@ -231,7 +231,7 @@ export default function Home({ username }: { username: string }) {
         <div className="main-content">
           <div className="side-panel">
             <div className="instructions">
-              <p>Bienvenu {username} !</p>
+              <p>Bienvenue {username} !</p>
               <p>
                 Votre objectif est de programmer une <b>IA qui joue au Dames</b>
                 . A chaque tour, la fonction "findMove" que vous allez coder
