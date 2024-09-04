@@ -136,7 +136,7 @@ export default function Home({ username }: { username: string }) {
       </Head>
       <main>
         <div className="topbar">
-          <img className="logo" src="clic.svg" />
+          <img className="logo" src="s4s/clic.svg" />
           <h1>Workshop Jeu de Dames</h1>
           <div className="toolbar">
             <button
