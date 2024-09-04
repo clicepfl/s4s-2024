@@ -2,72 +2,73 @@
 #include <vector>
 #include <string>
 #include <sstream>
-#include <optional>  // Include the optional header
+#include <optional>
 
-// Define the Piece structure similar to Java's record
+
 struct Piece {
-    char pieceType;
-    char pieceColor;
+    char pieceType; // pieceType: 'M' pour pion, 'K' pour dame
+    char pieceColor; // pieceColor: 'W' pour blanc, 'B' pour noir
     Piece(char type, char color) : pieceType(type), pieceColor(color) {}
 };
 
 struct Position {
-    int row;
-    int column;
+    int row; // row: ligne de la cellule
+    int column; // column: colonne de la cellule
 };
 
 struct Move {
-    Position from;
-    Position to;
+    Position from; // from: cellule de départ
+    Position to; // to: cellule d'arrivée
 };
 
-// Function to parse the board and return each cell's content as a vector of moves
+// Fonction pour trouver les coups à jouer
 std::vector<Move> findMove(const std::vector<std::vector<std::optional<Piece>>>& board, char playerColor) {
-    // TODO: Implement logic to find the next move
-    // The moves should be returned as a vector of 2-element vectors
-    // The first element of the sequence should be the starting cell
-    // Each subsequent 2-element vector should contain the x and y coordinates of the cell to move to
-    return {};
+    
+    // TODO: Implémentez ici la logique pour trouver les coups à jouer et les retourner
+    // Les coups doivent être retournés sous forme d'une liste d'objets Move,
+    // Chaque objet Move représente un coup, avec une cellule de départ et une cellule d'arrivée
+    // Les classes Position(row, column) et Move(from, to) sont fournies pour vous
+
+    std::vector<Move> moves = {{{6, 1}, {5, 0}}};
+
+    return moves;
 }
 
 int main() {
-    // Initialize a 10x10 board with std::optional<Piece>
     std::vector<std::vector<std::optional<Piece>>> board(10, std::vector<std::optional<Piece>>(10));
     char playerColor;
 
-    // Read the player's color
+    // Lecture de la couleur du joueur depuis la console
     std::cin >> playerColor;
     std::cin.ignore(); // Ignore the newline character after reading playerColor
 
-    // Read input line by line for the board
+    // Parsage du plateau de jeu depuis la console
     for (int r = 0; r < 10; r++) {
         std::string line;
-        std::getline(std::cin, line); // Read the entire line
+        std::getline(std::cin, line);
         std::stringstream ss(line);
         std::string pieceCode;
         int c = 0;
 
-        // Split the line by commas
         while (std::getline(ss, pieceCode, ',')) {
             if (!pieceCode.empty()) {
-                board[r][c] = Piece(pieceCode[0], pieceCode[1]); // Use std::optional to directly create a Piece
+                board[r][c] = Piece(pieceCode[0], pieceCode[1]);
             } else {
-                board[r][c].reset(); // Use reset() to clear the optional if it's empty
+                board[r][c].reset();
             }
             c++;
         }
     }
 
-    // Call the findMove function to find the next move
+    // Appel de la fonction findMove pour trouver les coups à jouer
     auto moves = findMove(board, playerColor);
 
     if (moves.empty()) {
-        // No moves found
         std::cerr << "No moves were returned." << std::endl;
         return 0;
     }
 
-    // Print the moves
+    // Envoi des coups trouvés à la console
     for (const auto& pos : moves) {
         std::cout 
             << pos.from.row << pos.from.column << "," 
