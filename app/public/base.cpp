@@ -29,7 +29,12 @@ std::vector<Move> findMove(const std::vector<std::vector<std::optional<Piece>>>&
     // Chaque objet Move représente un coup, avec une cellule de départ et une cellule d'arrivée
     // Les classes Position(row, column) et Move(from, to) sont fournies pour vous
 
-    std::vector<Move> moves = {{{6, 1}, {5, 0}}};
+    Position start = {6, 1};
+    Position end = {5, 0};
+    Move move = {start, end};
+
+    std::vector<Move> moves;
+    moves.push_back(move);
 
     return moves;
 }

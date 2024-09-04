@@ -33,7 +33,9 @@ def find_move(board, player_color):
     # Chaque objet Move représente un coup, avec une cellule de départ et une cellule d'arrivée
     # Les classes Position(row, column) et Move(start, end) sont fournies pour vous
     
-    return [Move(Position(6, 1), Position(5, 0))]
+    moves = [Move(Position(6, 1), Position(5, 0))]
+
+    return moves
 
 
 def main():
