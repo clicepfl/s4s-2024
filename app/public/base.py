@@ -65,7 +65,7 @@ def main():
 
     # Envoi des coups trouvés à la console
     for move in moves:
-        print(move)
+        print(move, end="")
     print("")
 
 
