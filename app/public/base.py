@@ -20,7 +20,7 @@ class Move:
         self.end = end
 
     def __str__(self):
-        return f"{self.start.row}{self.start.col},{self.end.row}{self.end.col}"
+        return f"{self.start.row}{self.start.col},{self.end.row}{self.end.col};"
 
     def __repr__(self):
         return self.__str__()
