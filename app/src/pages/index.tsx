@@ -112,7 +112,7 @@ export default function Home({ username }: { username: string }) {
           break;
         case AIErrorType.InvalidOutput:
           newConsoleOutput = newConsoleOutput.concat({
-            msg: "AI sent invalid output",
+            msg: "AI error or invalid output",
             msgType: ConsoleMessageType.Error,
           });
           break;
@@ -120,7 +120,6 @@ export default function Home({ username }: { username: string }) {
 
       if (turnStatus.ai_output && turnStatus.ai_output.length > 0) {
         newConsoleOutput = newConsoleOutput
-          .concat({ msg: "AI error", msgType: ConsoleMessageType.Error })
           .concat({
             msg: turnStatus.ai_output,
             msgType: ConsoleMessageType.Warning,
