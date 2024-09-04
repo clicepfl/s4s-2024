@@ -146,14 +146,17 @@ main {
   display: flex;
   gap: 1em;
   margin: 1em;
-  height: 88vh;
+  flex-direction: column;
 
-  @media (max-width: 60rem) {
-    flex-direction: column;
+  @media (min-width: 60rem) {
+    flex-direction: row;
+    height: 88vh;
   }
 
   .side-panel {
-    flex-basis: 50%;
+    @media (min-width: 60rem) {
+      flex-basis: 50%;
+    }
 
     background-color: var(--secondary-background-color);
     padding: 2em;
@@ -192,7 +195,7 @@ main {
 
         display: flex;
         flex-direction: column;
-        gap: .3em;
+        gap: 0.3em;
         width: 50%;
         height: 100%;
 
@@ -213,14 +216,15 @@ main {
         .success {
           color: var(--success-green);
         }
-        
       }
     }
   }
 
   .editor {
-    flex-basis: 50%;
-    overflow: hidden;
+    @media (min-width: 60rem) {
+      flex-basis: 50%;
+      overflow: hidden;
+    }
     padding-top: 2em;
     background-color: #1e1e1e;
   }
