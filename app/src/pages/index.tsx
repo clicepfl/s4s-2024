@@ -303,6 +303,7 @@ export default function Home({ username }: { username: string }) {
               theme="vs-dark"
               loading="Loading Editor..."
               language={selectedLang}
+              path={selectedLang}
               value={file}
               onChange={(code: string | undefined) =>
                 code ? setFile(code) : null
