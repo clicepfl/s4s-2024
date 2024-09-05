@@ -2,15 +2,27 @@
 
 import { SubmissionLanguage } from "@/api/models";
 import { initFiles } from "@/util/initCodeFiles";
-import React from "react";
+import Prism from "prismjs";
+import "prismjs/components/prism-c";
+import "prismjs/components/prism-cpp";
+import "prismjs/components/prism-java";
+import "prismjs/components/prism-python";
+import React, { useEffect } from "react";
 import { useState } from "react";
 
 interface CodeSwitcherProps {
-  codeSnippets: { [lang : string]: string };
+  codeSnippets: { [lang: string]: string };
 }
 
 export default function CodeSwitcher({ codeSnippets }: CodeSwitcherProps) {
   const [selectedLang, setSelectedLang] = useState(SubmissionLanguage.Java);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      Prism.highlightAll();
+      console.log("highlight");
+    }
+  }, [selectedLang]);
 
   return (
     <div className="code-switcher">
@@ -25,7 +37,9 @@ export default function CodeSwitcher({ codeSnippets }: CodeSwitcherProps) {
           </option>
         ))}
       </select>
-      <pre className="code-zone">
+      <pre
+        className={`code-zone language-${initFiles[selectedLang].extension}`}
+      >
         <code>{codeSnippets[selectedLang]}</code>
       </pre>
     </div>
