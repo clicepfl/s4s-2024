@@ -73,11 +73,25 @@ main {
 }
 
 .article-page {
-  max-width: 80ch;
+  font-size: 1.1rem;
+  max-width: min(65ch, 90%);
   margin: 0 auto;
+  margin-bottom: 2em;
+
+  h2 {
+    margin-top: 1em;
+    margin-bottom: .5em;
+  }
 
   p {
-    padding: 1em 0;
+    margin: .5em 0;
+  }
+
+  .note {
+    margin: 1em 0;
+    padding: 1em;
+    background-color: #131838;
+    border-radius: var(--border-radius);
   }
 }
 
@@ -251,6 +265,8 @@ main {
   margin: .5em 0;
 
   .code-zone {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
     padding: 1em;
     width: 100%;
     background-color: #1e1e1e;
