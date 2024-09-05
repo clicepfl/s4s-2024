@@ -265,7 +265,7 @@ main {
 .code-switcher {
   display: flex;
   flex-direction: column;
-  align-items: end;
+  align-items: flex-end;
   margin: 0.5em 0;
 
   .code-zone {

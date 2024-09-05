@@ -37,7 +37,7 @@ export default function CodeSwitcher({ codeSnippets }: CodeSwitcherProps) {
         ))}
       </select>
       <pre
-        className={`code-zone language-${initFiles[selectedLang].extension}`}
+        className={`code-zone language-${selectedLang}`}
       >
         <code>{codeSnippets[selectedLang]}</code>
       </pre>
