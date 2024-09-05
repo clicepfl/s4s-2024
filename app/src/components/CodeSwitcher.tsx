@@ -7,7 +7,7 @@ import "prismjs/components/prism-c";
 import "prismjs/components/prism-cpp";
 import "prismjs/components/prism-java";
 import "prismjs/components/prism-python";
-import React, { useEffect } from "react";
+import React, { useEffect, useReducer } from "react";
 import { useState } from "react";
 
 interface CodeSwitcherProps {
@@ -18,10 +18,7 @@ export default function CodeSwitcher({ codeSnippets }: CodeSwitcherProps) {
   const [selectedLang, setSelectedLang] = useState(SubmissionLanguage.Java);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      Prism.highlightAll();
-      console.log("highlight");
-    }
+    Prism.highlightAll();
   }, [selectedLang]);
 
   return (
@@ -29,7 +26,9 @@ export default function CodeSwitcher({ codeSnippets }: CodeSwitcherProps) {
       <select
         className="code-lang-select"
         value={selectedLang}
-        onChange={(e) => setSelectedLang(e.target.value as SubmissionLanguage)}
+        onChange={(e) => {
+          setSelectedLang(e.target.value as SubmissionLanguage);
+        }}
       >
         {Object.values(SubmissionLanguage).map((lang) => (
           <option key={lang} value={lang}>

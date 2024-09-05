@@ -140,52 +140,204 @@ export default function Hints() {
           possibles)
         </p>
 
-        <h3>Coups Possibles (Pion)</h3>
+        <h2>Morceaux de Solution !</h2>
+
+        <h3>Déplacements Possibles (Pions)</h3>
+
+        <CodeSwitcher
+          codeSnippets={{
+            [SubmissionLanguage.Java]: `// Vérifie les mouvements simples possibles et retourne une liste de ces mouvements
+private static List<Move> findSimpleMoves(Piece[][] board, int fromRow, int fromCol, int direction) {
+    List<Move> simpleMoves = new ArrayList<>();
+
+    // Vérifier la diagonale gauche
+    if (isValidMove(board, fromRow + direction, fromCol - 1)) {
+        simpleMoves.add(new Move(new Position(fromRow, fromCol), new Position(fromRow + direction, fromCol - 1)));
+    }
+
+    // Vérifier la diagonale droite
+    if (isValidMove(board, fromRow + direction, fromCol + 1)) {
+        simpleMoves.add(new Move(new Position(fromRow, fromCol), new Position(fromRow + direction, fromCol + 1)));
+    }
+
+    return simpleMoves;
+}
+
+// Vérifie si un mouvement simple est valide
+private static boolean isValidMove(Piece[][] board, int toRow, int toCol) {
+    return isValidPosition(board, toRow, toCol) && board[toRow][toCol] == null;
+}
+
+// Vérifie si une position est dans les limites du plateau
+private static boolean isValidPosition(Piece[][] board, int row, int col) {
+    return row >= 0 && row < board.length && col >= 0 && col < board[row].length;
+}`,
+            [SubmissionLanguage.Cpp]: `bool isValidMove(const std::vector<std::vector<std::optional<Piece>>>& board, int toRow, int toCol);
+bool isValidPosition(const std::vector<std::vector<std::optional<Piece>>>& board, int row, int col);
+
+// Vérifie les mouvements simples possibles et retourne une liste de ces mouvements
+std::vector<Move> findSimpleMoves(const std::vector<std::vector<std::optional<Piece>>>& board, int fromRow, int fromCol, int direction) {
+    std::vector<Move> simpleMoves;
+
+    // Vérifier la diagonale gauche
+    if (isValidMove(board, fromRow + direction, fromCol - 1)) {
+        simpleMoves.push_back({{fromRow, fromCol}, {fromRow + direction, fromCol - 1}});
+    }
+
+    // Vérifier la diagonale droite
+    if (isValidMove(board, fromRow + direction, fromCol + 1)) {
+        simpleMoves.push_back({{fromRow, fromCol}, {fromRow + direction, fromCol + 1}});
+    }
+
+    return simpleMoves;
+}
+    
+// Vérifie si un mouvement simple est valide
+bool isValidMove(const std::vector<std::vector<std::optional<Piece>>>& board, int toRow, int toCol) {
+    return isValidPosition(board, toRow, toCol) && !board[toRow][toCol];
+}
+    
+// Vérifie si une position est dans les limites du plateau
+bool isValidPosition(const std::vector<std::vector<std::optional<Piece>>>& board, int row, int col) {
+    return row >= 0 && row < board.size() && col >= 0 && col < board[0].size();
+}`,
+            [SubmissionLanguage.Python]: `def find_simple_moves(board, from_row, from_col, direction):
+    simple_moves = []
+
+    # Vérifier la diagonale gauche
+    if is_valid_move(board, from_row + direction, from_col - 1):
+        simple_moves.append(Move(Position(from_row, from_col), Position(from_row + direction, from_col - 1)))
+
+    # Vérifier la diagonale droite
+    if is_valid_move(board, from_row + direction, from_col + 1):
+        simple_moves.append(Move(Position(from_row, from_col), Position(from_row + direction, from_col + 1)))
+
+    return simple_moves
+
+
+def is_valid_move(board, to_row, to_col):
+    return is_valid_position(board, to_row, to_col) and board[to_row][to_col] is None
+
+
+def is_valid_position(board, row, col):
+    return 0 <= row < len(board) and 0 <= col < len(board[0])`,
+          }}
+        ></CodeSwitcher>
+
+        <h3>Prises Possibles (Pions)</h3>
 
         <CodeSwitcher
           codeSnippets={{
             [SubmissionLanguage.Java]: `
-static List<MoveWithTaken> calculateManRegularMoves(Board board, int x, int y) {
-  List<MoveWithTaken> moves = new ArrayList<>();
-  int[][] directions = { {-1, -1}, {1, -1} };
+// Vérifie les captures possibles et retourne une liste de ces mouvements
+private static List<Move> findCaptures(Piece[][] board, int fromRow, int fromCol, int direction, char playerColor) {
+    List<Move> captureMoves = new ArrayList<>();
 
-  for (int[] dir : directions) {
-      int newX = x + dir[0];
-      int newY = y + dir[1];
+    // Vérifier la capture par la diagonale gauche
+    if (canCapture(board, fromRow, fromCol, fromRow + direction, fromCol - 1, fromRow + 2 * direction, fromCol - 2, playerColor)) {
+        captureMoves.add(new Move(new Position(fromRow, fromCol), new Position(fromRow + 2 * direction, fromCol - 2)));
+    }
 
-      if (isWithinBoard(newX, newY, board) && board.getPiece(newX, newY) == null) {
-          moves.add(new MoveWithTaken(newX, newY, null));
-      }
-  }
+    // Vérifier la capture par la diagonale droite
+    if (canCapture(board, fromRow, fromCol, fromRow + direction, fromCol + 1, fromRow + 2 * direction, fromCol + 2, playerColor)) {
+        captureMoves.add(new Move(new Position(fromRow, fromCol), new Position(fromRow + 2 * direction, fromCol + 2)));
+    }
 
-  return moves;
+    return captureMoves;
 }
 
-static List<MoveWithTaken> calculateManTakeMoves(Board board, Piece piece, int x, int y) {
-  List<MoveWithTaken> moves = new ArrayList<>();
-  int[][] directions = { {-1, -1}, {1, -1}, {-1, 1}, {1, 1} };
-
-  for (int[] dir : directions) {
-      int takenX = x + dir[0];
-      int takenY = y + dir[1];
-      int newX = x + 2 * dir[0];
-      int newY = y + 2 * dir[1];
-
-      if (isWithinBoard(newX, newY, board)) {
-          Piece takenCell = board.getPiece(takenX, takenY);
-          Piece newCell = board.getPiece(newX, newY);
-
-          if (takenCell != null && !takenCell.player.equals(piece.player) && newCell == null) {
-              moves.add(new MoveWithTaken(newX, newY, new Position(takenX, takenY)));
-          }
-      }
-  }
-
-  return moves;
+// Vérifie si un mouvement simple est valide
+private static boolean isValidMove(Piece[][] board, int toRow, int toCol) {
+    return isValidPosition(board, toRow, toCol) && board[toRow][toCol] == null;
 }
+
+// Vérifie si une capture est possible
+private static boolean canCapture(Piece[][] board, int fromRow, int fromCol, int overRow, int overCol, int toRow, int toCol, char playerColor) {
+    if (!isValidPosition(board, toRow, toCol)) {
+        return false;
+    }
+
+    // La case de destination doit être vide
+    if (board[toRow][toCol] != null) {
+        return false;
+    }
+
+    // La pièce au-dessus doit être une pièce adverse
+    Piece middlePiece = board[overRow][overCol];
+    return middlePiece != null && middlePiece.pieceColor() != playerColor;
+}
+
+// Vérifie si une position est dans les limites du plateau
+private static boolean isValidPosition(Piece[][] board, int row, int col) {
+    return row >= 0 && row < board.length && col >= 0 && col < board[row].length;
+}
+
             `,
-            [SubmissionLanguage.Cpp]: "test code cpp",
-            [SubmissionLanguage.Python]: "test code python",
+            [SubmissionLanguage.Cpp]: `bool canCapture(const std::vector<std::vector<std::optional<Piece>>>& board, int fromRow, int fromCol, int overRow, int overCol, int toRow, int toCol, char playerColor);
+bool isValidPosition(const std::vector<std::vector<std::optional<Piece>>>& board, int row, int col);
+
+
+// Vérifie les captures possibles et retourne une liste de ces mouvements
+std::vector<Move> findCaptures(const std::vector<std::vector<std::optional<Piece>>>& board, int fromRow, int fromCol, int direction, char playerColor) {
+    std::vector<Move> captureMoves;
+
+    // Vérifier la capture par la diagonale gauche
+    if (canCapture(board, fromRow, fromCol, fromRow + direction, fromCol - 1, fromRow + 2 * direction, fromCol - 2, playerColor)) {
+        captureMoves.push_back({{fromRow, fromCol}, {fromRow + 2 * direction, fromCol - 2}});
+    }
+
+    // Vérifier la capture par la diagonale droite
+    if (canCapture(board, fromRow, fromCol, fromRow + direction, fromCol + 1, fromRow + 2 * direction, fromCol + 2, playerColor)) {
+        captureMoves.push_back({{fromRow, fromCol}, {fromRow + 2 * direction, fromCol + 2}});
+    }
+
+    return captureMoves;
+}
+
+
+// Vérifie si une capture est possible
+bool canCapture(const std::vector<std::vector<std::optional<Piece>>>& board, int fromRow, int fromCol, int overRow, int overCol, int toRow, int toCol, char playerColor) {
+    if (!isValidPosition(board, toRow, toCol) || board[toRow][toCol]) {
+        return false;
+    }
+
+    // La pièce à capturer doit appartenir à l'adversaire
+    const auto& middlePiece = board[overRow][overCol];
+    return middlePiece && middlePiece->pieceColor != playerColor;
+}
+
+// Vérifie si une position est dans les limites du plateau
+bool isValidPosition(const std::vector<std::vector<std::optional<Piece>>>& board, int row, int col) {
+    return row >= 0 && row < board.size() && col >= 0 && col < board[0].size();
+}`,
+            [SubmissionLanguage.Python]: `def find_captures(board, from_row, from_col, direction, player_color):
+    capture_moves = []
+
+    # Vérifier la capture par la diagonale gauche
+    if can_capture(board, from_row, from_col, from_row + direction, from_col - 1, from_row + 2 * direction, from_col - 2, player_color):
+        capture_moves.append(Move(Position(from_row, from_col), Position(from_row + 2 * direction, from_col - 2)))
+
+    # Vérifier la capture par la diagonale droite
+    if can_capture(board, from_row, from_col, from_row + direction, from_col + 1, from_row + 2 * direction, from_col + 2, player_color):
+        capture_moves.append(Move(Position(from_row, from_col), Position(from_row + 2 * direction, from_col + 2)))
+
+    return capture_moves
+    
+def can_capture(board, from_row, from_col, over_row, over_col, to_row, to_col, player_color):
+    if not is_valid_position(board, to_row, to_col):
+        return False
+
+    # La case de destination doit être vide
+    if board[to_row][to_col] is not None:
+        return False
+
+    # La pièce à capturer doit être une pièce adverse
+    middle_piece = board[over_row][over_col]
+    return middle_piece is not None and middle_piece.piece_color != player_color
+
+
+def is_valid_position(board, row, col):
+    return 0 <= row < len(board) and 0 <= col < len(board[0])`,
           }}
         ></CodeSwitcher>
       </div>
